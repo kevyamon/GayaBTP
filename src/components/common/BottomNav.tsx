@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Home, Search, ShieldCheck, Users, Calculator } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   const location = useLocation();
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
+
+  useEffect(() => {
+    const footer = document.getElementById('main-footer') || document.querySelector('footer');
+    if (!footer) {
+      setIsFooterVisible(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsFooterVisible(entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0.05,
+      }
+    );
+
+    observer.observe(footer);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [location.pathname]);
 
   const navItems = [
     { label: 'Accueil', path: '/', icon: Home },
@@ -20,7 +46,14 @@ export const BottomNav: React.FC = () => {
   };
 
   return (
-    <nav aria-label="Navigation mobile" className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-brand-dark/95 backdrop-blur-md border-t border-brand-light-border dark:border-brand-dark-border lg:hidden transition-colors duration-200">
+    <nav
+      aria-label="Navigation mobile"
+      className={`fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-brand-dark/95 backdrop-blur-md border-t border-brand-light-border dark:border-brand-dark-border lg:hidden transition-all duration-300 ease-in-out transform ${
+        isFooterVisible
+          ? 'translate-y-full opacity-0 pointer-events-none'
+          : 'translate-y-0 opacity-100 pointer-events-auto'
+      }`}
+    >
       <div className="grid grid-cols-5 h-16 max-w-lg mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -46,3 +79,4 @@ export const BottomNav: React.FC = () => {
     </nav>
   );
 };
+

@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
   const [isMobileExpanded, setIsMobileExpanded] = useState(false);
 
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 pt-10 lg:pt-16 pb-24 lg:pb-12 transition-all duration-300">
+    <footer id="main-footer" className="bg-slate-900 text-slate-300 border-t border-slate-800 pt-10 lg:pt-16 pb-10 lg:pb-12 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* En-tête Compact Mobile & Présentation Desktop */}

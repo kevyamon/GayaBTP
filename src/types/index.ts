@@ -11,6 +11,21 @@ export interface IUser {
   createdAt: string;
 }
 
+export interface IProServiceItem {
+  title: string;
+  indicativePriceFCFA?: number;
+  unit?: string;
+  description?: string;
+}
+
+export interface IProProjectItem {
+  title: string;
+  location: string;
+  year?: number;
+  imageUrl: string;
+  description?: string;
+}
+
 export interface IProProfile {
   _id: string;
   userId: string;
@@ -20,12 +35,18 @@ export interface IProProfile {
   city: string;
   district?: string;
   phoneWhatsApp?: string;
+  phoneCall?: string;
+  email?: string;
   bio?: string;
   yearsOfExperience?: number;
   isVerified: boolean;
   verificationStatus: 'not_requested' | 'pending' | 'verified' | 'rejected';
   hasProBadge: boolean;
   avatarUrl?: string;
+  coverUrl?: string;
+  completedProjectsCount?: number;
+  services?: IProServiceItem[];
+  portfolio?: IProProjectItem[];
 }
 
 export type PropertyType = 'terrain' | 'maison' | 'appartement' | 'immeuble' | 'commercial';

@@ -17,32 +17,32 @@ export const PortalsHubPage: React.FC = () => {
     {
       num: '01',
       title: 'Vérification du Titre Foncier (ACD / CMP)',
-      desc: 'Exigez la copie de l Arrêté de Concession Définitive ou du Certificat de Mutation de Propriété et contrôlez son enregistrement au Livre Foncier DGI.',
+      desc: 'Exigez la copie de l’Arrêté de Concession Définitive ou du Certificat de Mutation de Propriété et contrôlez son enregistrement au Livre Foncier DGI.',
     },
     {
       num: '02',
       title: 'Consultation Cadastrale & IDUFCI',
-      desc: 'Assurez-vous que le terrain dispose d un numéro IDUFCI actif et que le plan de situation est conforme à l extrait topographique.',
+      desc: 'Assurez-vous que le terrain dispose d’un numéro IDUFCI actif et que le plan de situation est conforme à l’extrait topographique.',
     },
     {
       num: '03',
       title: 'Bornage Contradictoire par Géomètre Expert',
-      desc: 'Faites réaliser un constat physique des limites par un géomètre assermenté inscrit au tableau de l OGECI.',
+      desc: 'Faites réaliser un constat physique des limites par un géomètre assermenté inscrit au tableau de l’OGECI.',
     },
     {
       num: '04',
-      title: 'Vérification de l Approbation Ministérielle',
-      desc: 'Pour les lotissements villageois, vérifiez l existence d un arrêté d approbation valide délivré par le MCLU.',
+      title: 'Vérification de l’Approbation Ministérielle',
+      desc: 'Pour les lotissements villageois, vérifiez l’existence d’un arrêté d’approbation valide délivré par le MCLU.',
     },
     {
       num: '05',
       title: 'Signature Obligatoire par Acte Notarié',
-      desc: 'Toute transaction immobilière en Côte d Ivoire doit obligatoirement être instrumentée par un Notaire sous peine de nullité absolue.',
+      desc: 'Toute transaction immobilière en Côte d’Ivoire doit obligatoirement être instrumentée par un Notaire sous peine de nullité absolue.',
     },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-28 lg:pb-16 space-y-12">
       
       {/* 1. EN-TÊTE INSTITUTIONNEL */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
@@ -62,7 +62,7 @@ export const PortalsHubPage: React.FC = () => {
             Avertissement de Transparence & Déontologie GayaBTP
           </h3>
           <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-            GayaBTP agit en tant que tiers technologique d orientation et de facilitation. Notre plateforme ne se substitue aucunement aux prérogatives souveraines de l’État de Côte d’Ivoire, des Conservations Foncières, du Ministère de la Construction (MCLU) ou des offices notariaux assermentés.
+            GayaBTP agit en tant que tiers technologique d’orientation et de facilitation. Notre plateforme ne se substitue aucunement aux prérogatives souveraines de l’État de Côte d’Ivoire, des Conservations Foncières, du Ministère de la Construction (MCLU) ou des offices notariaux assermentés.
           </p>
         </div>
       </div>
@@ -157,7 +157,7 @@ export const PortalsHubPage: React.FC = () => {
                 Calculateur de Frais Foncier
               </h3>
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-                Estimez immédiatement les droits d enregistrement DGI et honoraires notariés de votre projet.
+                Estimez immédiatement les droits d’enregistrement DGI et honoraires notariés de votre projet.
               </p>
             </div>
             <Link to="/calculateur">

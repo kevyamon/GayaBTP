@@ -22,13 +22,165 @@
   }
 }
 
-/* Effet Liquid Glassmorphism (Eau / Reflet liquide translucide) */
+/* Effet Liquid Glace (Eau / Verre givré aquatique translucide) */
 .glass-water {
-  background: linear-gradient(135deg, rgba(44, 95, 124, 0.88) 0%, rgba(15, 23, 42, 0.95) 55%, rgba(30, 70, 95, 0.85) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.3), 0 20px 40px -15px rgba(15, 23, 42, 0.5);
+  background: radial-gradient(
+    140% 140% at 10% 10%,
+    rgba(44, 95, 124, 0.75) 0%,
+    rgba(15, 23, 42, 0.88) 50%,
+    rgba(20, 60, 85, 0.82) 100%
+  );
+  backdrop-filter: blur(28px) saturate(170%);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1.5px 2px 0 rgba(145, 194, 158, 0.25),
+    0 25px 50px -12px rgba(15, 23, 42, 0.5);
+}
+
+/* ==========================================================================
+   GLASSMORPHISM DESIGN SYSTEM GAYABTP — SURFACES MULTI-COUCHES HAUTE FIDÉLITÉ
+   Conforme aux références visuelles : matière vitreuse, réfraction, diffusion
+   ========================================================================== */
+
+/* 1. INTENSITÉ SUBTLE (Transparence élevée, flou modéré) */
+.glassmorphism-subtle {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.10) 100%
+  );
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.10),
+    0 10px 25px -5px rgba(15, 23, 42, 0.05);
+}
+.dark .glassmorphism-subtle {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.45) 0%,
+    rgba(15, 23, 42, 0.35) 100%
+  );
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+    0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. INTENSITÉ MEDIUM (Rendu principal GayaBTP — Référence exacte) */
+.glassmorphism-medium {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.42) 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.28) 100%
+  );
+  backdrop-filter: blur(28px) saturate(185%);
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1.5px 0 rgba(255, 255, 255, 0.2),
+    0 20px 45px -12px rgba(15, 23, 42, 0.08),
+    0 8px 16px -6px rgba(15, 23, 42, 0.04);
+}
+.dark .glassmorphism-medium {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.65) 0%,
+    rgba(15, 23, 42, 0.55) 50%,
+    rgba(30, 41, 59, 0.60) 100%
+  );
+  backdrop-filter: blur(28px) saturate(185%);
+  -webkit-backdrop-filter: blur(28px) saturate(185%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 1.5px 0 rgba(255, 255, 255, 0.05),
+    0 20px 45px -12px rgba(0, 0, 0, 0.45),
+    0 8px 16px -6px rgba(0, 0, 0, 0.3);
+}
+
+/* 3. INTENSITÉ STRONG (Présence accrue sur backgrounds très contrastés) */
+.glassmorphism-strong {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.58) 0%,
+    rgba(255, 255, 255, 0.32) 50%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 
+    inset 0 2px 2px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1.5px 2px 0 rgba(255, 255, 255, 0.25),
+    0 25px 50px -12px rgba(15, 23, 42, 0.12);
+}
+.dark .glassmorphism-strong {
+  background: linear-gradient(
+    135deg,
+    rgba(30, 41, 59, 0.80) 0%,
+    rgba(15, 23, 42, 0.70) 100%
+  );
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    inset 0 2px 2px 0 rgba(255, 255, 255, 0.22),
+    0 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* 4. COUCHE DE REFLET DIAGONAL INTERNE DU VERRE (Effet matière vivante) */
+.glass-reflection-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.08) 28%,
+    transparent 55%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  z-index: 1;
+}
+.dark .glass-reflection-overlay {
+  background: linear-gradient(
+    125deg,
+    rgba(255, 255, 255, 0.10) 0%,
+    rgba(255, 255, 255, 0.02) 28%,
+    transparent 55%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+}
+
+/* 5. ÉTATS INTERACTIFS / HOVER SUR LES SURFACES DE VERRE */
+.glassmorphism-interactive {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glassmorphism-interactive:hover {
+  border-color: rgba(233, 144, 33, 0.45);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.95),
+    0 24px 50px -10px rgba(44, 95, 124, 0.14),
+    0 10px 20px -5px rgba(233, 144, 33, 0.10);
+  transform: translateY(-2px);
+}
+.dark .glassmorphism-interactive:hover {
+  border-color: rgba(233, 144, 33, 0.45);
+  box-shadow: 
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.2),
+    0 24px 50px -10px rgba(0, 0, 0, 0.55),
+    0 10px 20px -5px rgba(233, 144, 33, 0.15);
+  transform: translateY(-2px);
 }
 
 /* Personnalisation des popups Leaflet pour matcher le design tokenisé */
@@ -46,7 +198,115 @@
   z-index: 10;
 }
 
+/* Masquage propre de la barre de défilement pour les conteneurs défilants */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Animations légères et transitions douces */
 .transition-smooth {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Animation séquentielle de pulsation des cubes : aller-retour dynamique avec pause */
+@keyframes cubeGlowPulse {
+  0% {
+    opacity: 0;
+    transform: rotate(45deg) scale(1);
+  }
+  2.5% {
+    opacity: 1;
+    transform: rotate(45deg) scale(1.08);
+    filter: drop-shadow(0 0 8px #91C29E);
+  }
+  5.5% {
+    opacity: 0;
+    transform: rotate(45deg) scale(1);
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(45deg) scale(1);
+  }
+}
+
+@keyframes nodeGlowPulse {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  2.5% {
+    opacity: 1;
+    transform: scale(1.4);
+    filter: drop-shadow(0 0 6px #E99021);
+  }
+  5.5% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-cube-pulse {
+  animation: cubeGlowPulse 7.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-node-pulse {
+  animation: nodeGlowPulse 7.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Pulsation haute performance des cubes orange (accélération GPU pure) */
+@keyframes orangeCubePulse {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.96) rotate(45deg);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.04) rotate(45deg);
+  }
+}
+
+.animate-orange-pulse {
+  animation: orangeCubePulse 3.6s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+/* Animation d'apparition en onde de corde fluide pour les mots du titre */
+@keyframes ropeWave {
+  0% {
+    opacity: 0;
+    transform: translateY(26px) scale(0.88) rotate(-5deg);
+    filter: blur(3px);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.06) rotate(2.5deg);
+    filter: blur(0);
+  }
+  65% {
+    transform: translateY(3px) scale(0.98) rotate(-1deg);
+  }
+  85% {
+    transform: translateY(-1px) scale(1.01) rotate(0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+}
+
+.animate-rope-wave {
+  display: inline-block;
+  opacity: 0;
+  animation: ropeWave 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+

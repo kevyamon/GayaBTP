@@ -40,7 +40,7 @@ export const MOCK_LISTINGS: IListing[] = [
   {
     _id: 'lst-002',
     title: 'Parcelle commerciale de 1 200 m² avec ACD Global',
-    description: 'Emplacement stratégique de premier choix pour siège d entreprise, clinique ou résidence hôtelière. Accès goudronné direct.',
+    description: 'Emplacement stratégique de premier choix pour siège d’entreprise, clinique ou résidence hôtelière. Accès goudronné direct.',
     propertyType: 'terrain',
     transactionType: 'vente',
     priceFCFA: 85000000,

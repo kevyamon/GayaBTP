@@ -65,7 +65,7 @@ export const ListingsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-12 space-y-6">
       
       {/* En-tête et Bouton Créer une Alerte */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-light-border dark:border-brand-dark-border pb-6">
