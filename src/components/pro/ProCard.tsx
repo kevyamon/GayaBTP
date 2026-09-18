@@ -13,8 +13,8 @@ interface ProCardProps {
 export const ProCard: React.FC<ProCardProps> = ({ pro, onContactClick }) => {
   const whatsappUrl = pro.phoneWhatsApp
     ? `https://wa.me/${pro.phoneWhatsApp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
-        `Bonjour ${pro.companyName}, j’ai trouvé votre profil sur GayaBTP et je souhaiterais échanger avec vous pour un projet BTP / Foncier.`
-      )}`
+      `Bonjour ${pro.companyName}, j’ai trouvé votre profil sur GayaBTP et je souhaiterais échanger avec vous pour un projet BTP / Foncier.`
+    )}`
     : undefined;
 
   return (

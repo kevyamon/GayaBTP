@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 @layer base {
   :root {
     --color-primary: #E99021;
@@ -37,158 +38,6 @@
     inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.45),
     inset 0 -1.5px 2px 0 rgba(145, 194, 158, 0.25),
     0 25px 50px -12px rgba(15, 23, 42, 0.5);
-}
-
-/* ==========================================================================
-   GLASSMORPHISM DESIGN SYSTEM GAYABTP — SURFACES MULTI-COUCHES HAUTE FIDÉLITÉ
-   Conforme aux références visuelles : matière vitreuse, réfraction, diffusion
-   ========================================================================== */
-
-/* 1. INTENSITÉ SUBTLE (Transparence élevée, flou modéré) */
-.glassmorphism-subtle {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.28) 0%,
-    rgba(255, 255, 255, 0.10) 100%
-  );
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.75),
-    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.10),
-    0 10px 25px -5px rgba(15, 23, 42, 0.05);
-}
-.dark .glassmorphism-subtle {
-  background: linear-gradient(
-    135deg,
-    rgba(30, 41, 59, 0.45) 0%,
-    rgba(15, 23, 42, 0.35) 100%
-  );
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
-    0 10px 25px -5px rgba(0, 0, 0, 0.3);
-}
-
-/* 2. INTENSITÉ MEDIUM (Rendu principal GayaBTP — Référence exacte) */
-.glassmorphism-medium {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.42) 0%,
-    rgba(255, 255, 255, 0.18) 50%,
-    rgba(255, 255, 255, 0.28) 100%
-  );
-  backdrop-filter: blur(28px) saturate(185%);
-  -webkit-backdrop-filter: blur(28px) saturate(185%);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  box-shadow: 
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 1.5px 0 rgba(255, 255, 255, 0.2),
-    0 20px 45px -12px rgba(15, 23, 42, 0.08),
-    0 8px 16px -6px rgba(15, 23, 42, 0.04);
-}
-.dark .glassmorphism-medium {
-  background: linear-gradient(
-    135deg,
-    rgba(30, 41, 59, 0.65) 0%,
-    rgba(15, 23, 42, 0.55) 50%,
-    rgba(30, 41, 59, 0.60) 100%
-  );
-  backdrop-filter: blur(28px) saturate(185%);
-  -webkit-backdrop-filter: blur(28px) saturate(185%);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 1.5px 0 rgba(255, 255, 255, 0.05),
-    0 20px 45px -12px rgba(0, 0, 0, 0.45),
-    0 8px 16px -6px rgba(0, 0, 0, 0.3);
-}
-
-/* 3. INTENSITÉ STRONG (Présence accrue sur backgrounds très contrastés) */
-.glassmorphism-strong {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.58) 0%,
-    rgba(255, 255, 255, 0.32) 50%,
-    rgba(255, 255, 255, 0.45) 100%
-  );
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 
-    inset 0 2px 2px 0 rgba(255, 255, 255, 0.98),
-    inset 0 -1.5px 2px 0 rgba(255, 255, 255, 0.25),
-    0 25px 50px -12px rgba(15, 23, 42, 0.12);
-}
-.dark .glassmorphism-strong {
-  background: linear-gradient(
-    135deg,
-    rgba(30, 41, 59, 0.80) 0%,
-    rgba(15, 23, 42, 0.70) 100%
-  );
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 
-    inset 0 2px 2px 0 rgba(255, 255, 255, 0.22),
-    0 25px 50px -12px rgba(0, 0, 0, 0.6);
-}
-
-/* 4. COUCHE DE REFLET DIAGONAL INTERNE DU VERRE (Effet matière vivante) */
-.glass-reflection-overlay {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  background: linear-gradient(
-    125deg,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.08) 28%,
-    transparent 55%,
-    rgba(255, 255, 255, 0.06) 100%
-  );
-  z-index: 1;
-}
-.dark .glass-reflection-overlay {
-  background: linear-gradient(
-    125deg,
-    rgba(255, 255, 255, 0.10) 0%,
-    rgba(255, 255, 255, 0.02) 28%,
-    transparent 55%,
-    rgba(255, 255, 255, 0.02) 100%
-  );
-}
-
-/* 5. ÉTATS INTERACTIFS / HOVER SUR LES SURFACES DE VERRE */
-.glassmorphism-interactive {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.glassmorphism-interactive:hover {
-  border-color: rgba(233, 144, 33, 0.45);
-  box-shadow: 
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.95),
-    0 24px 50px -10px rgba(44, 95, 124, 0.14),
-    0 10px 20px -5px rgba(233, 144, 33, 0.10);
-  transform: translateY(-2px);
-}
-.dark .glassmorphism-interactive:hover {
-  border-color: rgba(233, 144, 33, 0.45);
-  box-shadow: 
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.2),
-    0 24px 50px -10px rgba(0, 0, 0, 0.55),
-    0 10px 20px -5px rgba(233, 144, 33, 0.15);
-  transform: translateY(-2px);
-}
-.dark .glassmorphism-interactive:hover {
-  border-color: rgba(233, 144, 33, 0.45);
-  box-shadow: 
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.2),
-    0 24px 50px -10px rgba(0, 0, 0, 0.55),
-    0 10px 20px -5px rgba(233, 144, 33, 0.15);
-  transform: translateY(-2px);
 }
 
 /* Personnalisation des popups Leaflet pour matcher le design tokenisé */
@@ -317,4 +166,3 @@
   opacity: 0;
   animation: ropeWave 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
-
