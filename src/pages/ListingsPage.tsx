@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Bell, Map, List, RotateCcw } from 'lucide-react';
+import { Search, Bell, Map, List } from 'lucide-react';
 import { ListingCard } from '../components/listing/ListingCard';
 import { MapView } from '../components/listing/MapView';
 import { CreateAlertModal } from '../components/listing/CreateAlertModal';
+import { ListingFilters, ListingFilterValues } from '../components/listing/ListingFilters';
 import { Button } from '../components/ui/Button';
 import { listingService, ListingFilterParams } from '../services/listing.service';
 import { IListing, PropertyType, LandTitleType } from '../types';
-import { IVORY_COAST_LOCATIONS, LAND_TITLE_TYPES } from '../theme/theme';
 
 export const ListingsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,50 +17,55 @@ export const ListingsPage: React.FC = () => {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   const [selectedListingId, setSelectedListingId] = useState<string | undefined>(undefined);
 
-  // État des filtres
-  const [city, setCity] = useState(searchParams.get('city') || '');
-  const [district, setDistrict] = useState(searchParams.get('district') || '');
-  const [propertyType, setPropertyType] = useState<PropertyType | ''>(
-    (searchParams.get('propertyType') as PropertyType) || ''
-  );
-  const [titleType, setTitleType] = useState<LandTitleType | ''>(
-    (searchParams.get('titleType') as LandTitleType) || ''
-  );
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [sort, setSort] = useState<'recent' | 'price_asc' | 'price_desc' | 'surface_desc'>('recent');
+  // État unifié des filtres
+  const [filters, setFilters] = useState<ListingFilterValues>({
+    city: searchParams.get('city') || '',
+    district: searchParams.get('district') || '',
+    propertyType: (searchParams.get('propertyType') as PropertyType) || '',
+    titleType: (searchParams.get('titleType') as LandTitleType) || '',
+    maxPrice: searchParams.get('maxPrice') || '',
+    sort: 'recent',
+    search: searchParams.get('search') || '',
+  });
 
-  const activeDistricts =
-    IVORY_COAST_LOCATIONS.find((l) => l.city === city)?.districts || [];
-
-  const fetchListings = async () => {
+  const fetchListings = useCallback(async (currentFilters: ListingFilterValues) => {
     setIsLoading(true);
     try {
       const params: ListingFilterParams = {
-        city: city || undefined,
-        district: district || undefined,
-        propertyType: (propertyType as PropertyType) || undefined,
-        titleType: (titleType as LandTitleType) || undefined,
-        maxPrice: maxPrice ? parseInt(maxPrice, 10) : undefined,
-        sort,
+        city: currentFilters.city || undefined,
+        district: currentFilters.district || undefined,
+        propertyType: (currentFilters.propertyType as PropertyType) || undefined,
+        titleType: (currentFilters.titleType as LandTitleType) || undefined,
+        maxPrice: currentFilters.maxPrice ? parseInt(currentFilters.maxPrice, 10) : undefined,
+        sort: currentFilters.sort,
+        search: currentFilters.search || undefined,
       };
       const { listings: result } = await listingService.getListings(params);
       setListings(result);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchListings();
-  }, [city, district, propertyType, titleType, maxPrice, sort]);
+    fetchListings(filters);
+  }, [filters, fetchListings]);
 
-  const resetFilters = () => {
-    setCity('');
-    setDistrict('');
-    setPropertyType('');
-    setTitleType('');
-    setMaxPrice('');
-    setSort('recent');
+  const handleFilterChange = (newFilters: ListingFilterValues) => {
+    setFilters(newFilters);
+  };
+
+  const handleResetFilters = () => {
+    const resetValues: ListingFilterValues = {
+      city: '',
+      district: '',
+      propertyType: '',
+      titleType: '',
+      maxPrice: '',
+      sort: 'recent',
+      search: '',
+    };
+    setFilters(resetValues);
     setSearchParams({});
   };
 
@@ -116,101 +121,13 @@ export const ListingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Barre de Filtres Rapides */}
-      <div className="p-4 rounded-brand-lg bg-white dark:bg-brand-dark-surface border border-brand-light-border dark:border-brand-dark-border shadow-sm grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Ville</label>
-          <select
-            value={city}
-            onChange={(e) => {
-              setCity(e.target.value);
-              setDistrict('');
-            }}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="">Toutes les villes</option>
-            {IVORY_COAST_LOCATIONS.map((l) => (
-              <option key={l.city} value={l.city}>
-                {l.city}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Commune</label>
-          <select
-            value={district}
-            onChange={(e) => setDistrict(e.target.value)}
-            disabled={activeDistricts.length === 0}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium disabled:opacity-50"
-          >
-            <option value="">Toutes les communes</option>
-            {activeDistricts.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Titre Foncier</label>
-          <select
-            value={titleType}
-            onChange={(e) => setTitleType(e.target.value as LandTitleType | '')}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="">Tous les titres</option>
-            {LAND_TITLE_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.value.toUpperCase()}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Type de bien</label>
-          <select
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value as PropertyType | '')}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="">Tous les types</option>
-            <option value="terrain">Terrain</option>
-            <option value="maison">Maison / Villa</option>
-            <option value="appartement">Appartement</option>
-            <option value="commercial">Commercial</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Tri par</label>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as typeof sort)}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="recent">Plus récents</option>
-            <option value="price_asc">Prix croissant</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="surface_desc">Plus grande surface</option>
-          </select>
-        </div>
-
-        <div className="flex items-end">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={resetFilters}
-            leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-            className="w-full text-xs"
-          >
-            Réinitialiser
-          </Button>
-        </div>
-      </div>
+      {/* Barre de Filtres Complète (Desktop en ligne & Mobile modale repliée) */}
+      <ListingFilters
+        filters={filters}
+        onChange={handleFilterChange}
+        onReset={handleResetFilters}
+        totalResults={listings.length}
+      />
 
       {/* VUE SCINDÉE (SPLIT VIEW) : LISTE + CARTE INTERACTIVE */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
@@ -264,8 +181,8 @@ export const ListingsPage: React.FC = () => {
       <CreateAlertModal
         isOpen={isAlertModalOpen}
         onClose={() => setIsAlertModalOpen(false)}
-        initialCity={city || 'Abidjan'}
-        initialTitleType={titleType || undefined}
+        initialCity={filters.city || 'Abidjan'}
+        initialTitleType={filters.titleType || undefined}
       />
 
     </div>

@@ -81,7 +81,7 @@ export const ProsPage: React.FC = () => {
           {[1, 2, 3, 4, 5, 6].map((idx) => (
             <div
               key={idx}
-              className="h-64 rounded-brand-xl bg-slate-200/70 dark:bg-slate-800/70 border border-brand-light-border dark:border-brand-dark-border"
+              className="h-64 rounded-brand-xl bg-slate-200/70 dark:bg-slate-800/70 !border-2 !border-brand-primary/40"
             />
           ))}
         </div>

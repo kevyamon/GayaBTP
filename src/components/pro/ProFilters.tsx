@@ -1,7 +1,9 @@
-import React from 'react';
-import { Search, RotateCcw, CheckSquare, Square } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, SlidersHorizontal, RotateCcw, CheckSquare, Square, Check } from 'lucide-react';
 import { ProFilterParams } from '../../services/pro.service';
 import { GlassmorphismCard } from '../ui/GlassmorphismCard';
+import { Button } from '../ui/Button';
+import { Modal } from '../ui/Modal';
 
 interface ProFiltersProps {
   filters: ProFilterParams;
@@ -37,16 +39,25 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
   onReset,
   totalResults,
 }) => {
+  const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
+  const [tempFilters, setTempFilters] = useState<ProFilterParams>(filters);
+
+  useEffect(() => {
+    if (isMobileModalOpen) {
+      setTempFilters(filters);
+    }
+  }, [isMobileModalOpen, filters]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange({ ...filters, search: e.target.value });
   };
 
-  const handleSpecialtyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange({ ...filters, specialty: e.target.value });
+  const handleSpecialtyChange = (val: string) => {
+    onChange({ ...filters, specialty: val });
   };
 
-  const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onChange({ ...filters, city: e.target.value });
+  const handleCityChange = (val: string) => {
+    onChange({ ...filters, city: val });
   };
 
   const handleAccountTypeChange = (type: 'all' | 'entreprise' | 'artisan') => {
@@ -57,143 +68,321 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
     onChange({ ...filters, verifiedOnly: !filters.verifiedOnly });
   };
 
+  const activeFiltersCount = [
+    Boolean(filters.specialty && filters.specialty !== 'all'),
+    Boolean(filters.city && filters.city !== 'all'),
+    Boolean(filters.accountType),
+    Boolean(filters.verifiedOnly),
+  ].filter(Boolean).length;
+
   const hasActiveFilters =
-    Boolean(filters.search) ||
-    (filters.specialty && filters.specialty !== 'all') ||
-    (filters.city && filters.city !== 'all') ||
-    Boolean(filters.accountType) ||
-    Boolean(filters.verifiedOnly);
+    Boolean(filters.search) || activeFiltersCount > 0;
+
+  const handleApplyMobileFilters = () => {
+    onChange(tempFilters);
+    setIsMobileModalOpen(false);
+  };
+
+  const handleResetMobileFilters = () => {
+    const emptyFilters: ProFilterParams = {
+      search: filters.search,
+    };
+    setTempFilters(emptyFilters);
+    onChange(emptyFilters);
+    setIsMobileModalOpen(false);
+  };
 
   return (
-    <GlassmorphismCard intensity="medium" className="p-5 space-y-4">
-      
-      {/* Barre de recherche textuelle principale */}
-      <div className="relative">
-        <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-        <input
-          type="text"
-          placeholder="Rechercher par nom d’entreprise, spécialité, mot-clé..."
-          value={filters.search || ''}
-          onChange={handleSearchChange}
-          className="w-full pl-11 pr-4 py-2.5 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary transition-smooth"
-        />
-      </div>
+    <div className="space-y-3">
+      {/* 1. VERSION MOBILE (< md) : Barre de recherche + Bouton Filtrer dépliant la modale */}
+      <div className="block md:hidden space-y-2.5">
+        <div className="relative">
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom, spécialité, mot-clé..."
+            value={filters.search || ''}
+            onChange={handleSearchChange}
+            className="w-full pl-10 pr-4 py-2.5 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark-surface text-slate-900 dark:text-white placeholder-slate-400 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm"
+          />
+        </div>
 
-      {/* Grille des sélecteurs de filtres */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        
-        {/* Sélecteur Spécialités */}
-        <div className="space-y-1">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Corps d’état / Spécialité
-          </label>
-          <select
-            value={filters.specialty || 'all'}
-            onChange={handleSpecialtyChange}
-            className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setIsMobileModalOpen(true)}
+            className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-brand font-bold text-xs bg-white dark:bg-brand-dark-surface border border-brand-light-border dark:border-brand-dark-border text-slate-800 dark:text-slate-100 hover:border-brand-primary shadow-sm active:scale-[0.98] transition-all"
           >
-            {SPECIALTY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <SlidersHorizontal className="w-4 h-4 text-brand-primary shrink-0" />
+            <span>Filtrer les professionnels</span>
+            {activeFiltersCount > 0 && (
+              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-full text-[10px] font-extrabold bg-brand-primary text-white">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
 
-        {/* Sélecteur Villes */}
-        <div className="space-y-1">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Zone Géographique
-          </label>
-          <select
-            value={filters.city || 'all'}
-            onChange={handleCityChange}
-            className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-          >
-            {CITY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Type de structure (Entreprise / Artisan) */}
-        <div className="space-y-1 sm:col-span-2 lg:col-span-1">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Type de Prestataire
-          </label>
-          <div className="flex rounded-brand border border-brand-light-border dark:border-brand-dark-border p-0.5 bg-slate-50 dark:bg-brand-dark">
-            <button
-              type="button"
-              onClick={() => handleAccountTypeChange('all')}
-              className={`flex-1 py-1 text-xs font-semibold rounded ${
-                !filters.accountType
-                  ? 'bg-brand-secondary text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              Tous
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAccountTypeChange('entreprise')}
-              className={`flex-1 py-1 text-xs font-semibold rounded ${
-                filters.accountType === 'entreprise'
-                  ? 'bg-brand-secondary text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              Entreprises
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAccountTypeChange('artisan')}
-              className={`flex-1 py-1 text-xs font-semibold rounded ${
-                filters.accountType === 'artisan'
-                  ? 'bg-brand-secondary text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              Artisans
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Barre basse : Case Vérifiés uniquement + Compteur & Réinitialisation */}
-      <div className="pt-2 border-t border-brand-light-border dark:border-brand-dark-border flex flex-wrap items-center justify-between gap-3 text-xs">
-        <button
-          type="button"
-          onClick={toggleVerifiedOnly}
-          className="inline-flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300 hover:text-brand-primary transition-colors select-none"
-        >
-          {filters.verifiedOnly ? (
-            <CheckSquare className="w-4 h-4 text-emerald-600" />
-          ) : (
-            <Square className="w-4 h-4 text-slate-400" />
-          )}
-          <span>Professionnels vérifiés uniquement</span>
-        </button>
-
-        <div className="flex items-center gap-3">
-          <span className="text-slate-500 dark:text-slate-400 font-semibold">
-            {totalResults} professionnel{totalResults > 1 ? 's' : ''} trouvé{totalResults > 1 ? 's' : ''}
-          </span>
           {hasActiveFilters && (
             <button
               type="button"
               onClick={onReset}
-              className="inline-flex items-center gap-1 text-brand-urgent hover:underline font-bold"
+              className="inline-flex items-center gap-1 py-2.5 px-3 rounded-brand text-xs font-bold text-brand-urgent hover:bg-brand-urgent/10 transition-colors border border-brand-urgent/30"
+              title="Réinitialiser tous les filtres"
             >
-              <RotateCcw className="w-3 h-3" />
-              <span>Réinitialiser</span>
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span className="hidden xs:inline">Effacer</span>
             </button>
           )}
         </div>
+
+        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold px-1">
+          {totalResults} professionnel{totalResults > 1 ? 's' : ''} trouvé{totalResults > 1 ? 's' : ''}
+        </div>
       </div>
 
-    </GlassmorphismCard>
+      {/* 2. MODALE POP-UP MOBILE DE FILTRES PRO */}
+      <Modal
+        isOpen={isMobileModalOpen}
+        onClose={() => setIsMobileModalOpen(false)}
+        title="Filtres professionnels"
+        subtitle="Sélectionnez les compétences et critères pour vos travaux"
+        maxWidth="md"
+      >
+        <div className="space-y-4 text-xs">
+          {/* Spécialité */}
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 dark:text-slate-300">Corps d’état / Spécialité</label>
+            <select
+              value={tempFilters.specialty || 'all'}
+              onChange={(e) => setTempFilters({ ...tempFilters, specialty: e.target.value })}
+              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+            >
+              {SPECIALTY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Zone Géographique */}
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 dark:text-slate-300">Zone Géographique</label>
+            <select
+              value={tempFilters.city || 'all'}
+              onChange={(e) => setTempFilters({ ...tempFilters, city: e.target.value })}
+              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+            >
+              {CITY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Type de Prestataire */}
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 dark:text-slate-300">Type de Prestataire</label>
+            <div className="flex rounded-brand border border-brand-light-border dark:border-brand-dark-border p-1 bg-slate-50 dark:bg-brand-dark">
+              <button
+                type="button"
+                onClick={() => setTempFilters({ ...tempFilters, accountType: undefined })}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded ${
+                  !tempFilters.accountType
+                    ? 'bg-brand-secondary text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                Tous
+              </button>
+              <button
+                type="button"
+                onClick={() => setTempFilters({ ...tempFilters, accountType: 'entreprise' })}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded ${
+                  tempFilters.accountType === 'entreprise'
+                    ? 'bg-brand-secondary text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                Entreprises
+              </button>
+              <button
+                type="button"
+                onClick={() => setTempFilters({ ...tempFilters, accountType: 'artisan' })}
+                className={`flex-1 py-1.5 text-xs font-semibold rounded ${
+                  tempFilters.accountType === 'artisan'
+                    ? 'bg-brand-secondary text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                Artisans
+              </button>
+            </div>
+          </div>
+
+          {/* Case Vérifiés Uniquement */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setTempFilters({ ...tempFilters, verifiedOnly: !tempFilters.verifiedOnly })}
+              className="inline-flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 select-none"
+            >
+              {tempFilters.verifiedOnly ? (
+                <CheckSquare className="w-4 h-4 text-emerald-600" />
+              ) : (
+                <Square className="w-4 h-4 text-slate-400" />
+              )}
+              <span>Professionnels vérifiés uniquement</span>
+            </button>
+          </div>
+
+          {/* Actions de validation dans la modale */}
+          <div className="pt-4 border-t border-brand-light-border dark:border-brand-dark-border flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleResetMobileFilters}
+              leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+            >
+              Réinitialiser
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              onClick={handleApplyMobileFilters}
+              leftIcon={<Check className="w-4 h-4" />}
+            >
+              Appliquer les filtres
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 3. VERSION DESKTOP (md:block) : Panneau inline complet */}
+      <GlassmorphismCard intensity="medium" className="hidden md:block p-5 space-y-4">
+        <div className="relative">
+          <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par nom d’entreprise, spécialité, mot-clé..."
+            value={filters.search || ''}
+            onChange={handleSearchChange}
+            className="w-full pl-11 pr-4 py-2.5 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary transition-smooth"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Corps d’état / Spécialité
+            </label>
+            <select
+              value={filters.specialty || 'all'}
+              onChange={(e) => handleSpecialtyChange(e.target.value)}
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            >
+              {SPECIALTY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Zone Géographique
+            </label>
+            <select
+              value={filters.city || 'all'}
+              onChange={(e) => handleCityChange(e.target.value)}
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            >
+              {CITY_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-1 sm:col-span-2 lg:col-span-1">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Type de Prestataire
+            </label>
+            <div className="flex rounded-brand border border-brand-light-border dark:border-brand-dark-border p-0.5 bg-slate-50 dark:bg-brand-dark">
+              <button
+                type="button"
+                onClick={() => handleAccountTypeChange('all')}
+                className={`flex-1 py-1 text-xs font-semibold rounded ${
+                  !filters.accountType
+                    ? 'bg-brand-secondary text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                Tous
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAccountTypeChange('entreprise')}
+                className={`flex-1 py-1 text-xs font-semibold rounded ${
+                  filters.accountType === 'entreprise'
+                    ? 'bg-brand-secondary text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                Entreprises
+              </button>
+              <button
+                type="button"
+                onClick={() => handleAccountTypeChange('artisan')}
+                className={`flex-1 py-1 text-xs font-semibold rounded ${
+                  filters.accountType === 'artisan'
+                    ? 'bg-brand-secondary text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                }`}
+              >
+                Artisans
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-2 border-t border-brand-light-border dark:border-brand-dark-border flex flex-wrap items-center justify-between gap-3 text-xs">
+          <button
+            type="button"
+            onClick={toggleVerifiedOnly}
+            className="inline-flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300 hover:text-brand-primary transition-colors select-none"
+          >
+            {filters.verifiedOnly ? (
+              <CheckSquare className="w-4 h-4 text-emerald-600" />
+            ) : (
+              <Square className="w-4 h-4 text-slate-400" />
+            )}
+            <span>Professionnels vérifiés uniquement</span>
+          </button>
+
+          <div className="flex items-center gap-3">
+            <span className="text-slate-500 dark:text-slate-400 font-semibold">
+              {totalResults} professionnel{totalResults > 1 ? 's' : ''} trouvé{totalResults > 1 ? 's' : ''}
+            </span>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={onReset}
+                className="inline-flex items-center gap-1 text-brand-urgent hover:underline font-bold"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Réinitialiser</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </GlassmorphismCard>
+    </div>
   );
 };
