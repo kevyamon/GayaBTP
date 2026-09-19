@@ -26,7 +26,7 @@ export const ProCard: React.FC<ProCardProps> = ({ pro, onContactClick }) => {
       <GlassmorphismCard
         intensity="medium"
         interactive
-        className="flex flex-col justify-between flex-1 relative z-10"
+        className="flex flex-col justify-between flex-1 relative z-10 !border-2 !border-brand-primary dark:!border-brand-primary shadow-sm hover:!border-brand-primary-hover transition-colors"
       >
         {/* Badge d’angle Gaya Vérifié — Collé à l'angle supérieur droit */}
         {pro.isVerified && (
@@ -131,8 +131,8 @@ export const ProCard: React.FC<ProCardProps> = ({ pro, onContactClick }) => {
           {/* Boutons d'action */}
           <div className="pt-2 flex items-center gap-2">
             <Link to={`/pros/${pro._id}`} className="flex-1">
-              <Button variant="secondary" size="sm" fullWidth rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
-                Voir profil
+              <Button variant="primary" size="sm" fullWidth rightIcon={<ArrowRight className="w-3.5 h-3.5" />}>
+                Voir le profil
               </Button>
             </Link>
 

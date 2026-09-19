@@ -54,17 +54,18 @@ export const BottomNav: React.FC = () => {
   return (
     <nav
       aria-label="Navigation principale mobile"
-      className={`fixed bottom-5 sm:bottom-7 left-1/2 -translate-x-1/2 z-40 lg:hidden transition-all duration-300 ease-out transform mb-[env(safe-area-inset-bottom,0px)] ${isFooterVisible
+      className={`fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 lg:hidden transition-all duration-300 ease-out transform mb-[env(safe-area-inset-bottom,0px)] ${
+        isFooterVisible
           ? 'translate-y-28 opacity-0 pointer-events-none'
           : 'translate-y-0 opacity-100 pointer-events-auto'
-        }`}
+      }`}
     >
-      {/* Conteneur Capsule Glassmorphism avec Fond Terre Battue */}
-      <div className="glass-tabbar-capsule relative flex items-center justify-between gap-1.5 sm:gap-2.5 px-3 py-2 sm:px-4 sm:py-2.5 max-w-[94vw] sm:max-w-md shadow-2xl">
+      {/* Conteneur Capsule Glassmorphism avec Fond Terre Battue & Vivid Orange */}
+      <div className="glass-tabbar-capsule relative grid grid-cols-5 items-center gap-1 px-1.5 py-1.5 sm:px-2.5 sm:py-2 w-[95vw] max-w-md shadow-2xl">
         {/* Couche de reflet diagonal interne du verre */}
-        <div className="glass-reflection-overlay rounded-full" aria-hidden="true" />
+        <div className="glass-reflection-overlay rounded-full pointer-events-none" aria-hidden="true" />
 
-        {/* Liste des éléments de navigation */}
+        {/* Liste des éléments de navigation avec libellés en dessous de l'icône */}
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
           const active = isRouteActive(item.path);
@@ -76,17 +77,26 @@ export const BottomNav: React.FC = () => {
               aria-label={item.label}
               aria-current={active ? 'page' : undefined}
               title={item.label}
-              className={`relative z-10 flex items-center justify-center rounded-full transition-all duration-300 ${active
-                  ? 'glass-tabbar-active-pill px-5 sm:px-6 py-2.5 text-white scale-100'
-                  : 'px-3.5 sm:px-4 py-2.5 text-white/80 hover:text-white hover:bg-white/10 hover:scale-105 active:scale-95'
-                }`}
+              className={`relative z-10 flex flex-col items-center justify-center py-1.5 px-0.5 sm:py-2 sm:px-1 rounded-xl transition-all duration-200 ease-out active:scale-95 select-none min-w-0 ${
+                active
+                  ? 'glass-tabbar-active-pill text-white scale-100 shadow-md'
+                  : 'text-white/80 hover:text-white hover:bg-white/10'
+              }`}
             >
               <Icon
-                className={`w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-200 ${active
-                    ? 'stroke-[2.4px] fill-white text-white drop-shadow-sm'
+                className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 transition-transform duration-200 ${
+                  active
+                    ? 'scale-105 stroke-[2.4px] text-white drop-shadow-sm'
                     : 'stroke-[1.9px] text-white/85'
-                  }`}
+                }`}
               />
+              <span
+                className={`text-[9px] sm:text-[10px] tracking-tight leading-none mt-1 text-center truncate max-w-full px-0.5 select-none ${
+                  active ? 'font-bold text-white drop-shadow-sm' : 'font-medium text-white/80'
+                }`}
+              >
+                {item.label}
+              </span>
             </Link>
           );
         })}
