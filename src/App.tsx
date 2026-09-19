@@ -6,6 +6,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { Header } from './components/common/Header';
 import { BottomNav } from './components/common/BottomNav';
 import { ScrollToTop } from './components/common/ScrollToTop';
+import { ScrollToUpButton } from './components/common/ScrollToUpButton';
 
 // Pages Sprint 1
 import { Home } from './pages/Home';
@@ -25,7 +26,7 @@ export const App: React.FC = () => {
         <AuthProvider>
           <BrowserRouter>
             <ScrollToTop />
-            <div className="flex flex-col min-h-screen bg-brand-light dark:bg-brand-dark text-slate-800 dark:text-slate-100 transition-colors duration-200">
+            <div className="flex flex-col min-h-screen bg-brand-light dark:bg-brand-dark text-slate-800 dark:text-slate-100">
               
               {/* En-tête officiel */}
               <Header />
@@ -56,6 +57,9 @@ export const App: React.FC = () => {
 
               {/* Barre de navigation inférieure pour PWA / Mobile */}
               <BottomNav />
+
+              {/* Bouton de retour en haut de page pour Desktop */}
+              <ScrollToUpButton />
 
             </div>
           </BrowserRouter>

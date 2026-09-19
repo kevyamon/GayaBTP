@@ -69,7 +69,16 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Animation séquentielle de pulsation des cubes : aller-retour dynamique avec pause */
+/* Désactivation des transitions pour un basculement de thème instantané sans scintillement */
+.disable-transitions,
+.disable-transitions * {
+  -webkit-transition: none !important;
+  -moz-transition: none !important;
+  -o-transition: none !important;
+  transition: none !important;
+}
+
+/* Animation séquentielle de pulsation des cubes : GPU-accelerated (will-change & zero drop-shadow) */
 @keyframes cubeGlowPulse {
   0% {
     opacity: 0;
@@ -77,13 +86,11 @@
   }
   2.5% {
     opacity: 1;
-    transform: rotate(45deg) scale(1.08);
-    filter: drop-shadow(0 0 8px #91C29E);
+    transform: rotate(45deg) scale(1.1);
   }
   5.5% {
     opacity: 0;
     transform: rotate(45deg) scale(1);
-    filter: drop-shadow(0 0 0 transparent);
   }
   100% {
     opacity: 0;
@@ -99,7 +106,6 @@
   2.5% {
     opacity: 1;
     transform: scale(1.4);
-    filter: drop-shadow(0 0 6px #E99021);
   }
   5.5% {
     opacity: 0;
@@ -112,10 +118,12 @@
 
 .animate-cube-pulse {
   animation: cubeGlowPulse 7.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
 }
 
 .animate-node-pulse {
   animation: nodeGlowPulse 7.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
 }
 
 /* Pulsation haute performance des cubes orange (accélération GPU pure) */

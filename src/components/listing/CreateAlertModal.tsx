@@ -52,10 +52,10 @@ export const CreateAlertModal: React.FC<CreateAlertModalProps> = ({
         minSurfaceM2: minSurfaceM2 ? parseInt(minSurfaceM2, 10) : undefined,
       });
 
-      success('Alerte configurée avec succès !', 'Vous recevrez un e-mail dès qu une nouvelle opportunité correspondante est publiée.');
+      success('Alerte configurée avec succès !', 'Vous recevrez un e-mail dès qu’une nouvelle opportunité correspondante est publiée.');
       onClose();
     } catch {
-      error('Impossible d enregistrer votre alerte. Veuillez réessayer.');
+      error('Impossible d’enregistrer votre alerte. Veuillez réessayer.');
     } finally {
       setIsLoading(false);
     }

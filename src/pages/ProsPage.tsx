@@ -10,14 +10,24 @@ import { GlassmorphismCard } from '../components/ui/GlassmorphismCard';
 import { Button } from '../components/ui/Button';
 
 export const ProsPage: React.FC = () => {
-  const [pros, setPros] = useState<IProProfile[]>([]);
+  const [pros, setPros] = useState<IProProfile[]>(() => {
+    return proService.getCachedPros();
+  });
   const [filters, setFilters] = useState<ProFilterParams>({});
   const [selectedProForContact, setSelectedProForContact] = useState<IProProfile | null>(null);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    return proService.getCachedPros().length === 0;
+  });
 
   const fetchPros = useCallback(async (currentFilters: ProFilterParams) => {
-    setIsLoading(true);
+    const cached = proService.getCachedPros(currentFilters);
+    if (cached.length > 0) {
+      setPros(cached);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
     try {
       const data = await proService.getPros(currentFilters);
       setPros(data);

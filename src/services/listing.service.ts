@@ -99,32 +99,83 @@ export const MOCK_LISTINGS: IListing[] = [
   },
 ];
 
+let inMemoryListings: IListing[] = [...MOCK_LISTINGS];
+
+function filterListingsArray(items: IListing[], params?: ListingFilterParams): IListing[] {
+  if (!params) return items;
+  let results = [...items];
+
+  if (params.propertyType) {
+    results = results.filter((item) => item.propertyType === params.propertyType);
+  }
+  if (params.city) {
+    results = results.filter((item) => item.city.toLowerCase() === params.city!.toLowerCase());
+  }
+  if (params.district) {
+    results = results.filter((item) => item.district?.toLowerCase() === params.district!.toLowerCase());
+  }
+  if (params.titleType) {
+    results = results.filter((item) => item.titleType === params.titleType);
+  }
+  if (params.maxPrice) {
+    results = results.filter((item) => item.priceFCFA <= params.maxPrice!);
+  }
+  if (params.search && params.search.trim()) {
+    const q = params.search.toLowerCase().trim();
+    results = results.filter(
+      (item) =>
+        item.title.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q) ||
+        item.city.toLowerCase().includes(q) ||
+        (item.district && item.district.toLowerCase().includes(q))
+    );
+  }
+  if (params.sort) {
+    if (params.sort === 'price_asc') results.sort((a, b) => a.priceFCFA - b.priceFCFA);
+    if (params.sort === 'price_desc') results.sort((a, b) => b.priceFCFA - a.priceFCFA);
+    if (params.sort === 'surface_desc') results.sort((a, b) => b.surfaceM2 - a.surfaceM2);
+  }
+  if (params.limit) {
+    results = results.slice(0, params.limit);
+  }
+  return results;
+}
+
 export const listingService = {
+  getCachedListings(params?: ListingFilterParams): IListing[] {
+    return filterListingsArray(inMemoryListings, params);
+  },
+
   async getListings(params?: ListingFilterParams): Promise<{ listings: IListing[]; total: number }> {
     try {
-      const response = await api.get<ApiResponse<IListing[]>>('/listings', { params });
-      if (response.data.success && response.data.data) {
+      const response = await api.get<ApiResponse<IListing[]>>('/listings', { params, timeout: 2000 });
+      if (response.data.success && response.data.data && response.data.data.length > 0) {
+        inMemoryListings = response.data.data;
+        const filtered = filterListingsArray(inMemoryListings, params);
         return {
-          listings: response.data.data.length > 0 ? response.data.data : MOCK_LISTINGS,
-          total: response.data.pagination?.total || MOCK_LISTINGS.length,
+          listings: filtered,
+          total: response.data.pagination?.total || filtered.length,
         };
       }
-      return { listings: MOCK_LISTINGS, total: MOCK_LISTINGS.length };
     } catch {
-      return { listings: MOCK_LISTINGS, total: MOCK_LISTINGS.length };
+      // Mode résilience immédiat
     }
+    const filtered = filterListingsArray(inMemoryListings, params);
+    return { listings: filtered, total: filtered.length };
   },
 
   async getListingById(id: string): Promise<IListing | null> {
+    const local = inMemoryListings.find((l) => l._id === id);
+    if (local) return local;
     try {
-      const response = await api.get<ApiResponse<IListing>>(`/listings/${id}`);
+      const response = await api.get<ApiResponse<IListing>>(`/listings/${id}`, { timeout: 2000 });
       if (response.data.success && response.data.data) {
         return response.data.data;
       }
-      return MOCK_LISTINGS.find((l) => l._id === id) || null;
     } catch {
-      return MOCK_LISTINGS.find((l) => l._id === id) || null;
+      // Mode résilience
     }
+    return MOCK_LISTINGS.find((l) => l._id === id) || null;
   },
 
   async createAlert(payload: {
@@ -137,7 +188,7 @@ export const listingService = {
     titleType?: LandTitleType;
   }): Promise<boolean> {
     try {
-      const response = await api.post('/alerts', payload);
+      const response = await api.post('/alerts', payload, { timeout: 3000 });
       return response.data.success;
     } catch {
       return true; // Mode résilience

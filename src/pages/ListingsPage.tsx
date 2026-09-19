@@ -6,18 +6,12 @@ import { MapView } from '../components/listing/MapView';
 import { CreateAlertModal } from '../components/listing/CreateAlertModal';
 import { ListingFilters, ListingFilterValues } from '../components/listing/ListingFilters';
 import { Button } from '../components/ui/Button';
+import { GlassmorphismCard } from '../components/ui/GlassmorphismCard';
 import { listingService, ListingFilterParams } from '../services/listing.service';
 import { IListing, PropertyType, LandTitleType } from '../types';
 
 export const ListingsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [listings, setListings] = useState<IListing[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
-  const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
-  const [selectedListingId, setSelectedListingId] = useState<string | undefined>(undefined);
-
-  // État unifié des filtres
   const [filters, setFilters] = useState<ListingFilterValues>({
     city: searchParams.get('city') || '',
     district: searchParams.get('district') || '',
@@ -28,18 +22,35 @@ export const ListingsPage: React.FC = () => {
     search: searchParams.get('search') || '',
   });
 
+  const [listings, setListings] = useState<IListing[]>(() => {
+    return listingService.getCachedListings();
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    return listingService.getCachedListings().length === 0;
+  });
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
+  const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
+  const [selectedListingId, setSelectedListingId] = useState<string | undefined>(undefined);
+
   const fetchListings = useCallback(async (currentFilters: ListingFilterValues) => {
-    setIsLoading(true);
+    const params: ListingFilterParams = {
+      city: currentFilters.city || undefined,
+      district: currentFilters.district || undefined,
+      propertyType: (currentFilters.propertyType as PropertyType) || undefined,
+      titleType: (currentFilters.titleType as LandTitleType) || undefined,
+      maxPrice: currentFilters.maxPrice ? parseInt(currentFilters.maxPrice, 10) : undefined,
+      sort: currentFilters.sort,
+      search: currentFilters.search || undefined,
+    };
+    // Filtrage instantané synchrone pour 0ms de latence
+    const cached = listingService.getCachedListings(params);
+    if (cached.length > 0) {
+      setListings(cached);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
     try {
-      const params: ListingFilterParams = {
-        city: currentFilters.city || undefined,
-        district: currentFilters.district || undefined,
-        propertyType: (currentFilters.propertyType as PropertyType) || undefined,
-        titleType: (currentFilters.titleType as LandTitleType) || undefined,
-        maxPrice: currentFilters.maxPrice ? parseInt(currentFilters.maxPrice, 10) : undefined,
-        sort: currentFilters.sort,
-        search: currentFilters.search || undefined,
-      };
       const { listings: result } = await listingService.getListings(params);
       setListings(result);
     } finally {
@@ -70,10 +81,14 @@ export const ListingsPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-12 space-y-6">
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-12 space-y-6 overflow-hidden">
+      {/* Orbes ambiants diffus pour enrichir la réfraction du verre sur toute la page */}
+      <div className="absolute top-16 left-12 w-96 h-96 rounded-full bg-brand-accent/20 dark:bg-brand-accent/15 blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 right-12 w-96 h-96 rounded-full bg-brand-primary/15 dark:bg-brand-primary/15 blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-1/3 left-1/4 w-80 h-80 rounded-full bg-sky-400/15 dark:bg-sky-400/10 blur-3xl pointer-events-none -z-10" />
       
       {/* En-tête et Bouton Créer une Alerte */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-light-border dark:border-brand-dark-border pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-light-border dark:border-brand-dark-border pb-6 relative z-10">
         <div>
           <h1 className="text-2xl sm:text-3xl font-title text-slate-900 dark:text-white">
             Terrains & Offres Immobilières
@@ -130,29 +145,33 @@ export const ListingsPage: React.FC = () => {
       />
 
       {/* VUE SCINDÉE (SPLIT VIEW) : LISTE + CARTE INTERACTIVE */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[600px] relative z-10">
         
         {/* Colonne Liste d'annonces (7 cols) */}
         <div className={`lg:col-span-7 space-y-4 ${mobileView === 'map' ? 'hidden lg:block' : 'block'}`}>
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-pulse">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-72 rounded-brand-lg bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                <div key={i} className="h-72 rounded-brand-xl bg-slate-200/70 dark:bg-slate-800/70 !border-2 !border-brand-primary/40" />
               ))}
             </div>
           ) : listings.length === 0 ? (
-            <div className="p-12 text-center rounded-brand-lg border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-brand-dark-surface space-y-3">
-              <Search className="w-10 h-10 text-slate-400 mx-auto" />
-              <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">
-                Aucune offre ne correspond exactement à vos critères
-              </h3>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Modifiez vos filtres ou activez une alerte pour être averti de toute nouvelle mise en ligne.
-              </p>
+            <GlassmorphismCard intensity="medium" className="text-center py-16 px-6 space-y-4">
+              <div className="w-12 h-12 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
+                <Search className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                  Aucune offre ne correspond exactement à vos critères
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
+                  Modifiez vos filtres ou activez une alerte pour être averti de toute nouvelle mise en ligne.
+                </p>
+              </div>
               <Button variant="primary" size="sm" onClick={() => setIsAlertModalOpen(true)}>
                 Créer une alerte personnalisée
               </Button>
-            </div>
+            </GlassmorphismCard>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {listings.map((item) => (

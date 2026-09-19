@@ -182,35 +182,44 @@ export const MOCK_PROS: IProProfile[] = [
   },
 ];
 
+let inMemoryPros: IProProfile[] = [...MOCK_PROS];
+
 export const proService = {
+  getCachedPros(params?: ProFilterParams): IProProfile[] {
+    return filterMockPros(inMemoryPros, params);
+  },
+
   async getPros(params?: ProFilterParams): Promise<IProProfile[]> {
     try {
-      const response = await api.get<ApiResponse<IProProfile[]>>('/pros', { params });
+      const response = await api.get<ApiResponse<IProProfile[]>>('/pros', { params, timeout: 2000 });
       if (response.data.success && response.data.data && response.data.data.length > 0) {
-        return response.data.data;
+        inMemoryPros = response.data.data;
+        return filterMockPros(inMemoryPros, params);
       }
-      return filterMockPros(params);
     } catch {
-      return filterMockPros(params);
+      // Mode résilience immédiat
     }
+    return filterMockPros(inMemoryPros, params);
   },
 
   async getProById(id: string): Promise<IProProfile | null> {
+    const local = inMemoryPros.find((p) => p._id === id);
+    if (local) return local;
     try {
-      const response = await api.get<ApiResponse<IProProfile>>(`/pros/${id}`);
+      const response = await api.get<ApiResponse<IProProfile>>(`/pros/${id}`, { timeout: 2000 });
       if (response.data.success && response.data.data) {
         return response.data.data;
       }
-      return MOCK_PROS.find((p) => p._id === id) || null;
     } catch {
-      return MOCK_PROS.find((p) => p._id === id) || null;
+      // Mode résilience
     }
+    return MOCK_PROS.find((p) => p._id === id) || null;
   },
 };
 
-function filterMockPros(params?: ProFilterParams): IProProfile[] {
-  if (!params) return MOCK_PROS;
-  let results = [...MOCK_PROS];
+function filterMockPros(sourceList: IProProfile[], params?: ProFilterParams): IProProfile[] {
+  if (!params) return sourceList;
+  let results = [...sourceList];
 
   if (params.specialty && params.specialty !== 'all') {
     results = results.filter((p) =>

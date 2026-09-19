@@ -85,6 +85,6 @@ export const IVORY_COAST_LOCATIONS = [
 export const LAND_TITLE_TYPES = [
   { value: 'ACD', label: 'Arrêté de Concession Définitive (ACD)', description: 'Titre de pleine propriété inattaquable émis par le MCLU.', isTopSecurity: true },
   { value: 'CMP', label: 'Certificat de Mutation Propriété (CMP)', description: 'Titre légal constatant le transfert notarié de propriété.', isTopSecurity: true },
-  { value: 'approbation', label: 'Lotissement Approuvé', description: 'Attestation villageoise avec arrêté d approbation ministériel.', isTopSecurity: false },
+  { value: 'approbation', label: 'Lotissement Approuvé', description: 'Attestation villageoise avec arrêté d’approbation ministériel.', isTopSecurity: false },
   { value: 'bail_emphytéotique', label: 'Bail Emphytéotique', description: 'Droit réel de très longue durée (18 à 99 ans).', isTopSecurity: false },
 ] as const;

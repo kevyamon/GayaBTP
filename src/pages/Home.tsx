@@ -17,19 +17,31 @@ export const Home: React.FC = () => {
   const [propertyType, setPropertyType] = useState<PropertyType>('terrain');
   const [titleType, setTitleType] = useState<LandTitleType | ''>('');
   const [maxPrice, setMaxPrice] = useState('');
-  const [recentListings, setRecentListings] = useState<IListing[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [recentListings, setRecentListings] = useState<IListing[]>(() => {
+    return listingService.getCachedListings({ limit: 4 });
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    return listingService.getCachedListings().length === 0;
+  });
 
   useEffect(() => {
+    let isMounted = true;
     const fetchListings = async () => {
       try {
         const { listings } = await listingService.getListings({ limit: 4 });
-        setRecentListings(listings.slice(0, 4));
+        if (isMounted) {
+          setRecentListings(listings.slice(0, 4));
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
     fetchListings();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -84,13 +96,19 @@ export const Home: React.FC = () => {
                 </span>
               </h1>
 
-              <div className="space-y-3 max-w-2xl mx-auto">
-                <p className="text-base sm:text-lg text-slate-700 dark:text-slate-200 leading-relaxed font-medium drop-shadow-sm">
-                  La plateforme ivoirienne dédiée à la transparence foncière, aux titres sécurisés (ACD/CMP) et aux professionnels du bâtiment labellisés.
+              <div className="space-y-3.5 max-w-3xl mx-auto px-2">
+                {/* Phrase d'accroche mise en valeur */}
+                <p className="text-base sm:text-xl font-bold text-brand-secondary dark:text-sky-300 tracking-tight drop-shadow-sm">
+                  Construisez vos projets en toute confiance
                 </p>
 
-                {/* Slogan Officiel GayaBTP inséré naturellement avec une visibilité nette */}
-                <p className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-wide">
+                {/* Descriptif synthétique des offres & services */}
+                <p className="text-xs sm:text-base text-slate-700 dark:text-slate-200 leading-relaxed font-medium drop-shadow-sm">
+                  Terrains, logements, professionnels et services BTP vérifiés : <strong className="text-slate-900 dark:text-white font-semibold">GayaBTP</strong> réunit tout ce dont vous avez besoin pour acheter, construire, vendre ou développer votre projet immobilier en Côte d’Ivoire.
+                </p>
+
+                {/* Slogan Officiel GayaBTP */}
+                <p className="text-sm sm:text-lg font-bold text-slate-900 dark:text-white tracking-wide pt-1">
                   <span className="text-brand-secondary dark:text-sky-300">Gaya<span className="text-brand-primary">BTP</span></span>, le BTP et l’immobilier, connectés pour vous !
                 </p>
               </div>
@@ -201,11 +219,10 @@ export const Home: React.FC = () => {
               </Button>
             </Link>
           </div>
-
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-pulse">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-80 rounded-brand-lg bg-slate-200 dark:bg-slate-800 animate-pulse" />
+                <div key={n} className="h-80 rounded-brand-xl bg-slate-200/70 dark:bg-slate-800/70 !border-2 !border-brand-primary/40" />
               ))}
             </div>
           ) : (
