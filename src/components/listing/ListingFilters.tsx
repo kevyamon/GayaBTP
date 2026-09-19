@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, SlidersHorizontal, RotateCcw, Check } from 'lucide-react';
+import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
 import { PropertyType, LandTitleType } from '../../types';
 import { IVORY_COAST_LOCATIONS, LAND_TITLE_TYPES } from '../../theme/theme';
-import { Button } from '../ui/Button';
-import { Modal } from '../ui/Modal';
 import { GlassmorphismCard } from '../ui/GlassmorphismCard';
+import { ListingFiltersModal } from './ListingFiltersModal';
 
 export interface ListingFilterValues {
   city: string;
@@ -39,7 +38,7 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
     }
   }, [isMobileModalOpen, filters]);
 
-  // Calcul du nombre de filtres actifs (hors tri et texte)
+  // Calcul du nombre de filtres actifs
   const activeFiltersCount = [
     Boolean(filters.city),
     Boolean(filters.district),
@@ -48,6 +47,8 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
     Boolean(filters.maxPrice),
     filters.sort !== 'recent',
   ].filter(Boolean).length;
+
+  const hasActiveFilters = Boolean(filters.search) || activeFiltersCount > 0;
 
   const handleApplyMobileFilters = () => {
     onChange(tempFilters);
@@ -70,14 +71,12 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
   };
 
   const activeDistricts =
-    IVORY_COAST_LOCATIONS.find((l) => l.city === (isMobileModalOpen ? tempFilters.city : filters.city))
-      ?.districts || [];
+    IVORY_COAST_LOCATIONS.find((l) => l.city === filters.city)?.districts || [];
 
   return (
     <div className="space-y-3">
-      {/* 1. VERSION MOBILE (< lg) : Barre de recherche + Bouton Filtrer dépliant la modale */}
-      <div className="block lg:hidden space-y-2.5">
-        {/* Barre de recherche mobile */}
+      {/* 1. VERSION MOBILE (< md) : Barre de recherche + Bouton Filtrer dépliant la modale */}
+      <div className="block md:hidden space-y-2.5">
         <div className="relative">
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
@@ -89,7 +88,6 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
           />
         </div>
 
-        {/* Bouton Filtrer sous la barre de recherche avec badge & actions rapides */}
         <div className="flex items-center justify-between gap-2">
           <button
             type="button"
@@ -105,7 +103,7 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
             )}
           </button>
 
-          {activeFiltersCount > 0 && (
+          {hasActiveFilters && (
             <button
               type="button"
               onClick={onReset}
@@ -118,30 +116,46 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
           )}
         </div>
 
-        {/* Compteur de résultats sur mobile */}
         <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold px-1">
           {totalResults} annonce{totalResults > 1 ? 's' : ''} disponible{totalResults > 1 ? 's' : ''}
         </div>
       </div>
 
-      {/* 2. MODALE POP-UP MOBILE DE FILTRES */}
-      <Modal
+      {/* 2. MODALE MOBILE */}
+      <ListingFiltersModal
         isOpen={isMobileModalOpen}
         onClose={() => setIsMobileModalOpen(false)}
-        title="Filtres de recherche"
-        subtitle="Affinez vos critères pour trouver la parcelle ou le bien idéal"
-        maxWidth="md"
-      >
-        <div className="space-y-4 text-xs">
+        tempFilters={tempFilters}
+        setTempFilters={setTempFilters}
+        onApply={handleApplyMobileFilters}
+        onReset={handleResetMobileFilters}
+      />
+
+      {/* 3. VERSION DESKTOP (md:block) : Panneau Glassmorphism complet aligné sur l'Annuaire */}
+      <GlassmorphismCard intensity="medium" className="hidden md:block p-5 space-y-4">
+        {/* Barre de recherche principale */}
+        <div className="relative">
+          <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Rechercher par commune, titre foncier, type de bien, mot-clé..."
+            value={filters.search}
+            onChange={(e) => onChange({ ...filters, search: e.target.value })}
+            className="w-full pl-11 pr-4 py-2.5 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary transition-smooth"
+          />
+        </div>
+
+        {/* Grille des sélecteurs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {/* Ville */}
           <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Ville / Région</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Ville / Région
+            </label>
             <select
-              value={tempFilters.city}
-              onChange={(e) =>
-                setTempFilters({ ...tempFilters, city: e.target.value, district: '' })
-              }
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+              value={filters.city}
+              onChange={(e) => onChange({ ...filters, city: e.target.value, district: '' })}
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
             >
               <option value="">Toutes les villes</option>
               {IVORY_COAST_LOCATIONS.map((l) => (
@@ -154,12 +168,14 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
 
           {/* Commune */}
           <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Commune / Secteur</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Commune / Secteur
+            </label>
             <select
-              value={tempFilters.district}
-              onChange={(e) => setTempFilters({ ...tempFilters, district: e.target.value })}
+              value={filters.district}
+              onChange={(e) => onChange({ ...filters, district: e.target.value })}
               disabled={activeDistricts.length === 0}
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium disabled:opacity-50 focus:ring-2 focus:ring-brand-primary"
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
             >
               <option value="">Toutes les communes</option>
               {activeDistricts.map((d) => (
@@ -172,18 +188,18 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
 
           {/* Titre Foncier */}
           <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Titre Foncier Requis</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Titre Foncier
+            </label>
             <select
-              value={tempFilters.titleType}
-              onChange={(e) =>
-                setTempFilters({ ...tempFilters, titleType: e.target.value as LandTitleType | '' })
-              }
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+              value={filters.titleType}
+              onChange={(e) => onChange({ ...filters, titleType: e.target.value as LandTitleType | '' })}
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
             >
-              <option value="">Tous les titres juridiques</option>
+              <option value="">Tous les titres</option>
               {LAND_TITLE_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
-                  {t.value.toUpperCase()} — {t.label}
+                  {t.value.toUpperCase()}
                 </option>
               ))}
             </select>
@@ -191,15 +207,15 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
 
           {/* Type de bien */}
           <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Type de bien</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Type de bien
+            </label>
             <select
-              value={tempFilters.propertyType}
-              onChange={(e) =>
-                setTempFilters({ ...tempFilters, propertyType: e.target.value as PropertyType | '' })
-              }
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+              value={filters.propertyType}
+              onChange={(e) => onChange({ ...filters, propertyType: e.target.value as PropertyType | '' })}
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
             >
-              <option value="">Tous les types de biens</option>
+              <option value="">Tous les types</option>
               <option value="terrain">Terrain / Parcelle</option>
               <option value="maison">Maison / Villa</option>
               <option value="appartement">Appartement</option>
@@ -207,153 +223,40 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
             </select>
           </div>
 
-          {/* Budget maximum */}
+          {/* Ordre d'affichage */}
           <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Budget Maximum (FCFA)</label>
-            <input
-              type="number"
-              placeholder="Ex : 50 000 000"
-              value={tempFilters.maxPrice}
-              onChange={(e) => setTempFilters({ ...tempFilters, maxPrice: e.target.value })}
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-            />
-          </div>
-
-          {/* Tri */}
-          <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Ordre d’affichage</label>
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Ordre d’affichage
+            </label>
             <select
-              value={tempFilters.sort}
-              onChange={(e) =>
-                setTempFilters({ ...tempFilters, sort: e.target.value as typeof tempFilters.sort })
-              }
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+              value={filters.sort}
+              onChange={(e) => onChange({ ...filters, sort: e.target.value as typeof filters.sort })}
+              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
             >
-              <option value="recent">Plus récents en premier</option>
-              <option value="price_asc">Prix croissant (du - cher au + cher)</option>
+              <option value="recent">Plus récents</option>
+              <option value="price_asc">Prix croissant</option>
               <option value="price_desc">Prix décroissant</option>
               <option value="surface_desc">Plus grande surface</option>
             </select>
           </div>
+        </div>
 
-          {/* Actions de validation dans la modale */}
-          <div className="pt-4 border-t border-brand-light-border dark:border-brand-dark-border flex items-center justify-between gap-3">
-            <Button
+        {/* Pied du panneau : Compteur & Réinitialisation */}
+        <div className="pt-2 border-t border-brand-light-border dark:border-brand-dark-border flex flex-wrap items-center justify-between gap-3 text-xs">
+          <span className="text-slate-500 dark:text-slate-400 font-semibold">
+            {totalResults} offre{totalResults > 1 ? 's' : ''} disponible{totalResults > 1 ? 's' : ''}
+          </span>
+
+          {hasActiveFilters && (
+            <button
               type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleResetMobileFilters}
-              leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+              onClick={onReset}
+              className="inline-flex items-center gap-1 text-brand-urgent hover:underline font-bold"
             >
-              Réinitialiser
-            </Button>
-
-            <Button
-              type="button"
-              variant="primary"
-              size="sm"
-              onClick={handleApplyMobileFilters}
-              leftIcon={<Check className="w-4 h-4" />}
-            >
-              Appliquer les filtres
-            </Button>
-          </div>
-        </div>
-      </Modal>
-
-      {/* 3. VERSION DESKTOP (lg:block) : Barre complète en ligne */}
-      <GlassmorphismCard
-        intensity="medium"
-        className="hidden lg:grid p-4 rounded-brand-lg border border-brand-light-border dark:border-brand-dark-border shadow-sm grid-cols-6 gap-3 items-end"
-      >
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Ville</label>
-          <select
-            value={filters.city}
-            onChange={(e) => onChange({ ...filters, city: e.target.value, district: '' })}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="">Toutes les villes</option>
-            {IVORY_COAST_LOCATIONS.map((l) => (
-              <option key={l.city} value={l.city}>
-                {l.city}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Commune</label>
-          <select
-            value={filters.district}
-            onChange={(e) => onChange({ ...filters, district: e.target.value })}
-            disabled={activeDistricts.length === 0}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium disabled:opacity-50"
-          >
-            <option value="">Toutes les communes</option>
-            {activeDistricts.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Titre Foncier</label>
-          <select
-            value={filters.titleType}
-            onChange={(e) => onChange({ ...filters, titleType: e.target.value as LandTitleType | '' })}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="">Tous les titres</option>
-            {LAND_TITLE_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.value.toUpperCase()}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Type de bien</label>
-          <select
-            value={filters.propertyType}
-            onChange={(e) => onChange({ ...filters, propertyType: e.target.value as PropertyType | '' })}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="">Tous les types</option>
-            <option value="terrain">Terrain</option>
-            <option value="maison">Maison / Villa</option>
-            <option value="appartement">Appartement</option>
-            <option value="commercial">Commercial</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">Tri par</label>
-          <select
-            value={filters.sort}
-            onChange={(e) => onChange({ ...filters, sort: e.target.value as typeof filters.sort })}
-            className="w-full text-xs rounded border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2 text-slate-900 dark:text-slate-100 font-medium"
-          >
-            <option value="recent">Plus récents</option>
-            <option value="price_asc">Prix croissant</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="surface_desc">Plus grande surface</option>
-          </select>
-        </div>
-
-        <div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-            className="w-full text-xs"
-          >
-            Réinitialiser
-          </Button>
+              <RotateCcw className="w-3 h-3" />
+              <span>Réinitialiser les filtres</span>
+            </button>
+          )}
         </div>
       </GlassmorphismCard>
     </div>
