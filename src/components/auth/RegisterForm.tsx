@@ -1,26 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import {
-  User,
-  Briefcase,
-  Building2,
-  Compass,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  Phone,
-  MapPin,
-  ArrowRight,
-  Loader2,
-  SlidersHorizontal,
-} from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Phone, MapPin, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { authService } from '../../services/auth.service';
 import { SocialAuthButtons } from './SocialAuthButtons';
 import { RoleSelectorModal } from './RoleSelectorModal';
-import { QUICK_ROLE_TYPES, QuickRoleType } from '../../types/roles';
+import { RoleQuickSelector } from './RoleQuickSelector';
+import { QuickRoleType } from '../../types/roles';
 
 export const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
@@ -108,157 +95,125 @@ export const RegisterForm: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4">
-      {/* 1. Sélecteur Rapide de Rôle (4 Cartes avec Icônes) */}
-      <div className="space-y-1.5">
-        <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-          Je suis
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {QUICK_ROLE_TYPES.map((type) => {
-            const isSelected = selectedQuickType === type.id;
-            const Icon =
-              type.id === 'particulier'
-                ? User
-                : type.id === 'professionnel'
-                  ? Briefcase
-                  : type.id === 'entreprise'
-                    ? Building2
-                    : Compass;
+    <div className="space-y-3.5">
+      {/* 1. Sélecteur Rapide de Rôle Modulaire */}
+      <RoleQuickSelector
+        selectedQuickType={selectedQuickType}
+        selectedRole={selectedRole}
+        onSelectQuickType={handleQuickTypeSelect}
+        onOpenRoleModal={() => setIsRoleModalOpen(true)}
+      />
 
-            return (
-              <button
-                key={type.id}
-                type="button"
-                onClick={() => handleQuickTypeSelect(type.id)}
-                className={`flex flex-col items-center justify-center p-2.5 rounded-2xl border transition-all duration-150 text-center cursor-pointer active:scale-95 ${isSelected
-                    ? 'bg-brand-primary/15 border-brand-primary text-brand-primary shadow-sm ring-1 ring-brand-primary'
-                    : 'bg-white/60 dark:bg-black/30 border-slate-200/80 dark:border-white/10 text-slate-700 dark:text-slate-300 hover:border-slate-300'
-                  }`}
-              >
-                <Icon className={`w-4 h-4 mb-1 ${isSelected ? 'text-brand-primary' : 'text-slate-500'}`} />
-                <span className="text-xs font-bold leading-tight">{type.label}</span>
-              </button>
-            );
-          })}
+      {/* 2. Formulaire d'Informations */}
+      <form onSubmit={handleSubmit} className="space-y-2.5">
+        {/* Champ Nom */}
+        <div className="relative">
+          <User className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            required
+            placeholder={
+              selectedQuickType === 'entreprise'
+                ? 'Nom de l’entreprise ou raison sociale'
+                : 'Nom complet'
+            }
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner transition-all"
+          />
         </div>
-      </div>
 
-      {/* 2. Affichage de la spécialité précise pour les profils PRO / ENTREPRISE / GÉOMÈTRE */}
-      {selectedQuickType !== 'particulier' && (
-        <div className="flex items-center justify-between p-2.5 rounded-xl bg-brand-primary/10 border border-brand-primary/30 text-xs">
-          <div className="min-w-0 pr-2">
-            <span className="text-[10px] text-slate-500 dark:text-slate-400 block">Spécialité BTP / Foncier :</span>
-            <span className="font-bold text-slate-800 dark:text-white truncate block">{selectedRole}</span>
+        {/* Champ E-mail */}
+        <div className="relative">
+          <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="email"
+            required
+            placeholder="Adresse e-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner transition-all"
+          />
+        </div>
+
+        {/* Champs Téléphone et Ville (pour les pros et particuliers) */}
+        {selectedQuickType !== 'particulier' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 animate-in fade-in duration-200">
+            <div className="relative">
+              <Phone className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="tel"
+                placeholder="Téléphone / WhatsApp"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner"
+              />
+            </div>
+            <div className="relative">
+              <MapPin className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Ville (ex: Abidjan)"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner"
+              />
+            </div>
           </div>
+        )}
+
+        {/* Champ Mot de Passe */}
+        <div className="relative">
+          <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type={showPassword ? 'text' : 'password'}
+            required
+            minLength={8}
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full pl-11 pr-11 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner transition-all"
+          />
           <button
             type="button"
-            onClick={() => setIsRoleModalOpen(true)}
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-brand-primary hover:underline shrink-0 cursor-pointer"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+            aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
           >
-            <SlidersHorizontal className="w-3 h-3" />
-            <span>Changer</span>
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
-      )}
 
-      {/* 3. Formulaire d'Informations */}
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <div className="space-y-1">
-          <div className="relative">
-            <User className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              required
-              placeholder={selectedQuickType === 'entreprise' ? "Nom de l'entreprise ou raison sociale" : "Nom complet"}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <div className="relative">
-            <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="email"
-              required
-              placeholder="Adresse e-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <div className="relative">
-            <Phone className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="tel"
-              placeholder="Téléphone / WhatsApp"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
-            />
-          </div>
-          <div className="relative">
-            <MapPin className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              placeholder="Ville (ex: Abidjan)"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <div className="relative">
-            <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type={showPassword ? 'text' : 'password'}
-              required
-              minLength={8}
-              placeholder="Mot de passe (min. 8 caractères)"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-11 pr-11 py-2.5 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 p-1"
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          </div>
-        </div>
-
-        <label className="flex items-start gap-2 pt-1 text-[11px] text-slate-600 dark:text-slate-400 cursor-pointer select-none">
+        {/* Conditions Générales d'Utilisation */}
+        <label className="flex items-start gap-2 pt-0.5 text-[11px] text-slate-600 dark:text-slate-400 cursor-pointer select-none leading-tight">
           <input
             type="checkbox"
             checked={acceptTerms}
             onChange={(e) => setAcceptTerms(e.target.checked)}
-            className="mt-0.5 rounded border-slate-300 text-brand-primary focus:ring-brand-primary"
+            className="mt-0.5 rounded border-slate-300 text-brand-secondary focus:ring-brand-secondary"
           />
           <span>
             J’accepte les{' '}
-            <span className="text-brand-primary underline">Conditions d’utilisation</span> et la{' '}
-            <span className="text-brand-primary underline">Politique de confidentialité</span>.
+            <span className="text-brand-secondary font-semibold hover:underline">
+              Conditions d’utilisation
+            </span>{' '}
+            et la{' '}
+            <span className="text-brand-secondary font-semibold hover:underline">
+              Politique de confidentialité
+            </span>
+            .
           </span>
         </label>
 
+        {/* Bouton Créer mon compte (Pill Noir Arrondi) */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full mt-2 py-3 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 font-bold text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] disabled:opacity-60"
+          className="w-full mt-1.5 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-bold text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] disabled:opacity-60"
         >
           {isLoading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-white dark:text-slate-950" />
               <span>Création du compte...</span>
             </>
           ) : (
@@ -270,15 +225,21 @@ export const RegisterForm: React.FC = () => {
         </button>
       </form>
 
-      <SocialAuthButtons actionText="S’inscrire avec Google" separatorText="ou s’inscrire avec" />
+      {/* Authentification Google */}
+      <SocialAuthButtons actionText="Continuer avec Google" separatorText="ou s’inscrire avec" />
 
-      <div className="pt-2 text-center text-xs text-slate-600 dark:text-slate-400">
+      {/* Lien vers Connexion */}
+      <div className="pt-0.5 text-center text-xs text-slate-600 dark:text-slate-400">
         Déjà un compte ?{' '}
-        <Link to={`/login${location.search}`} className="font-bold text-brand-primary hover:underline">
+        <Link
+          to={`/login${location.search}`}
+          className="font-bold text-brand-secondary hover:text-brand-secondary-hover dark:text-sky-300 hover:underline"
+        >
           Se connecter
         </Link>
       </div>
 
+      {/* Modale de Sélection des Spécialités BTP */}
       <RoleSelectorModal
         isOpen={isRoleModalOpen}
         onClose={() => setIsRoleModalOpen(false)}

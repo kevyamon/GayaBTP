@@ -20,7 +20,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Récupération de l'URL de redirection éventuelle (ex: /publier)
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
 
@@ -50,7 +49,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
   };
 
   const handleGoogleAuth = () => {
-    // Intégration Google OAuth
     success(
       'Connexion Google',
       'Authentification avec votre compte Google en cours de traitement.'
@@ -58,72 +56,68 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
   };
 
   return (
-    <div className="space-y-5">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-3.5">
         {/* Champ Adresse E-mail */}
         <div className="space-y-1">
-          <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-            Adresse e-mail
-          </label>
           <div className="relative">
             <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="email"
               required
               autoComplete="email"
-              placeholder="votre.email@exemple.com"
+              placeholder="Adresse e-mail"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
+              className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner transition-all"
             />
           </div>
         </div>
 
         {/* Champ Mot de Passe */}
         <div className="space-y-1">
-          <div className="flex items-center justify-between">
-            <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
-              Mot de passe
-            </label>
-            <button
-              type="button"
-              onClick={() => onForgotPasswordClick(email)}
-              className="text-[11px] font-bold text-brand-primary hover:underline cursor-pointer"
-            >
-              Mot de passe oublié ?
-            </button>
-          </div>
           <div className="relative">
             <Lock className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type={showPassword ? 'text' : 'password'}
               required
               autoComplete="current-password"
-              placeholder="••••••••"
+              placeholder="Mot de passe"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-11 pr-11 py-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-inner"
+              className="w-full pl-11 pr-11 py-3 rounded-2xl border border-slate-200/90 dark:border-white/10 bg-white/70 dark:bg-black/40 text-slate-900 dark:text-white placeholder-slate-400 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:border-brand-secondary shadow-inner transition-all"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-1"
-              aria-label={showPassword ? 'Masquer' : 'Afficher'}
+              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
             >
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
+
+          {/* Lien Mot de passe oublié à droite */}
+          <div className="flex justify-end pt-0.5">
+            <button
+              type="button"
+              onClick={() => onForgotPasswordClick(email)}
+              className="text-[11px] font-bold text-brand-secondary hover:text-brand-secondary-hover dark:text-sky-300 hover:underline cursor-pointer"
+            >
+              Mot de passe oublié ?
+            </button>
+          </div>
         </div>
 
-        {/* Bouton Principal de Connexion */}
+        {/* Bouton Principal de Connexion (Pill Noir Arrondi) */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full mt-2 py-3.5 px-6 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100 font-bold text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.98] disabled:opacity-60"
+          className="w-full mt-2 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-bold text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.98] disabled:opacity-60"
         >
           {isLoading ? (
             <>
-              <Loader2 className="w-4 h-4 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin text-white dark:text-slate-950" />
               <span>Connexion en cours...</span>
             </>
           ) : (
@@ -143,11 +137,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
       />
 
       {/* Lien vers Inscription */}
-      <div className="pt-2 text-center text-xs text-slate-600 dark:text-slate-400">
+      <div className="pt-1 text-center text-xs text-slate-600 dark:text-slate-400">
         Vous n’avez pas de compte ?{' '}
         <Link
           to={`/register${location.search}`}
-          className="font-bold text-brand-primary hover:underline"
+          className="font-bold text-brand-secondary hover:text-brand-secondary-hover dark:text-sky-300 hover:underline"
         >
           Créer un compte
         </Link>

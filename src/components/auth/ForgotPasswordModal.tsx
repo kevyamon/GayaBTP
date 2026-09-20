@@ -127,7 +127,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 placeholder="votre.email@exemple.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary shadow-sm"
               />
             </div>
           </div>
@@ -156,7 +156,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
               Code de sécurité à 6 chiffres
             </label>
             <div className="relative">
-              <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-primary" />
+              <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-brand-secondary" />
               <input
                 type="text"
                 required
@@ -164,7 +164,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 placeholder="Ex : 123456"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-brand-primary/40 dark:border-brand-primary/40 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm font-bold tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-brand-secondary/40 dark:border-brand-secondary/40 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm font-bold tracking-widest text-center focus:outline-none focus:ring-2 focus:ring-brand-secondary shadow-sm"
               />
             </div>
           </div>
@@ -182,7 +182,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 placeholder="••••••••"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary shadow-sm"
               />
             </div>
           </div>
@@ -200,7 +200,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary shadow-sm"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-secondary shadow-sm"
               />
             </div>
           </div>
@@ -209,7 +209,7 @@ export const ForgotPasswordModal: React.FC<ForgotPasswordModalProps> = ({
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-brand-primary font-semibold cursor-pointer"
+              className="inline-flex items-center gap-1 text-[11px] text-slate-500 hover:text-brand-secondary font-semibold cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Renvoyer un code</span>

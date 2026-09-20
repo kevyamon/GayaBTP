@@ -15,24 +15,24 @@ export const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
   isLoading = false,
 }) => {
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-3.5 w-full">
       {/* Séparateur avec texte discret */}
       <div className="relative flex items-center justify-center">
         <div className="w-full border-t border-slate-300/60 dark:border-white/15" />
-        <span className="absolute bg-white/90 dark:bg-slate-900/90 px-3 text-[11px] font-medium text-slate-500 dark:text-slate-400 rounded-full select-none">
+        <span className="absolute bg-white/95 dark:bg-slate-900/95 px-3 text-[11px] font-medium text-slate-500 dark:text-slate-400 rounded-full select-none">
           {separatorText}
         </span>
       </div>
 
-      {/* Bouton Google Officiel en Verre Translucide */}
+      {/* Bouton Google Officiel en Pilule Translucide (rounded-full) */}
       <button
         type="button"
         onClick={onGoogleClick}
         disabled={isLoading}
-        className="w-full relative flex items-center justify-center gap-3 py-3 px-4 rounded-2xl bg-white/70 dark:bg-white/10 hover:bg-white/95 dark:hover:bg-white/15 border border-slate-200/80 dark:border-white/20 text-slate-800 dark:text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow transition-all duration-200 cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group"
+        className="w-full relative flex items-center justify-center gap-3 py-3 px-4 rounded-full bg-white/75 dark:bg-white/10 hover:bg-white/95 dark:hover:bg-white/15 border border-slate-300/80 dark:border-white/20 text-slate-800 dark:text-white font-semibold text-xs sm:text-sm shadow-sm hover:shadow transition-all duration-200 cursor-pointer active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed group"
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin text-brand-primary" />
+          <Loader2 className="w-4 h-4 animate-spin text-brand-secondary" />
         ) : (
           /* Icône Officielle Google SVG Quadri */
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
