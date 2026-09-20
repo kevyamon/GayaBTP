@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -21,6 +21,61 @@ import { GlassmorphismDemoPage } from './pages/GlassmorphismDemoPage';
 
 // Pages Sprint 3
 import { CalculatorPage } from './pages/CalculatorPage';
+import { CreateListingPage } from './pages/CreateListingPage';
+import { JobsPage } from './pages/JobsPage';
+
+// Pages Sprint 4 (Authentification & Espace Utilisateur)
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+
+const AppContent: React.FC = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
+  return (
+    <div className="flex flex-col min-h-screen bg-brand-light dark:bg-brand-dark text-slate-800 dark:text-slate-100">
+      {/* En-tête officiel masqué sur les pages d'authentification immersives */}
+      {!isAuthPage && <Header />}
+
+      {/* Contenu principal des routes */}
+      <main className="flex-1 flex flex-col">
+        <Routes>
+          {/* SPRINT 1 */}
+          <Route path="/" element={<Home />} />
+          <Route path="/annonces" element={<ListingsPage />} />
+          <Route path="/annonces/:id" element={<ListingDetailPage />} />
+          <Route path="/verification" element={<PortalsHubPage />} />
+
+          {/* SPRINT 2 */}
+          <Route path="/pros" element={<ProsPage />} />
+          <Route path="/pros/:id" element={<ProDetailPage />} />
+
+          {/* SPRINT 3 */}
+          <Route path="/calculateur" element={<CalculatorPage />} />
+          <Route path="/publier" element={<CreateListingPage />} />
+          <Route path="/emplois" element={<JobsPage />} />
+
+          {/* SPRINT 4 (Authentification) */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          {/* Banc d'essai Glassmorphism */}
+          <Route path="/glassmorphism-demo" element={<GlassmorphismDemoPage />} />
+
+          {/* Redirections douces */}
+          <Route path="/blog" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+
+      {/* Barre de navigation inférieure mobile masquée sur les pages d'authentification */}
+      {!isAuthPage && <BottomNav />}
+
+      {/* Bouton retour en haut de page */}
+      {!isAuthPage && <ScrollToUpButton />}
+    </div>
+  );
+};
 
 export const App: React.FC = () => {
   return (
@@ -29,44 +84,7 @@ export const App: React.FC = () => {
         <AuthProvider>
           <BrowserRouter>
             <ScrollToTop />
-            <div className="flex flex-col min-h-screen bg-brand-light dark:bg-brand-dark text-slate-800 dark:text-slate-100">
-              
-              {/* En-tête officiel */}
-              <Header />
-
-              {/* Contenu principal des routes */}
-              <main className="flex-1 flex flex-col">
-                <Routes>
-                  {/* SPRINT 1 (Pages 1, 2, 3) */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/annonces" element={<ListingsPage />} />
-                  <Route path="/annonces/:id" element={<ListingDetailPage />} />
-                  <Route path="/verification" element={<PortalsHubPage />} />
-
-                  {/* SPRINT 2 (Pages 4, 5, 6) */}
-                  <Route path="/pros" element={<ProsPage />} />
-                  <Route path="/pros/:id" element={<ProDetailPage />} />
-
-                  {/* SPRINT 3 (Outils Métiers & Opportunités) */}
-                  <Route path="/calculateur" element={<CalculatorPage />} />
-
-                  {/* Banc d'essai Glassmorphism Design System */}
-                  <Route path="/glassmorphism-demo" element={<GlassmorphismDemoPage />} />
-
-                  {/* Redirections douces pour les sprints ultérieurs */}
-                  <Route path="/emplois" element={<Navigate to="/" replace />} />
-                  <Route path="/blog" element={<Navigate to="/" replace />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </main>
-
-              {/* Barre de navigation inférieure pour PWA / Mobile */}
-              <BottomNav />
-
-              {/* Bouton de retour en haut de page pour Desktop */}
-              <ScrollToUpButton />
-
-            </div>
+            <AppContent />
           </BrowserRouter>
         </AuthProvider>
       </ToastProvider>
@@ -75,3 +93,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

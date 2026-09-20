@@ -6,6 +6,7 @@ import {
   ShieldCheck,
   Users,
   Calculator,
+  Briefcase,
   ChevronLeft,
   ChevronRight,
   PlusCircle,
@@ -32,6 +33,7 @@ export const Header: React.FC = () => {
     { name: 'Vérification Foncière', path: '/verification', icon: ShieldCheck },
     { name: 'Annuaire Pros BTP', path: '/pros', icon: Users },
     { name: 'Calculateur Foncier', path: '/calculateur', icon: Calculator },
+    { name: 'Emplois & Stages', path: '/emplois', icon: Briefcase },
   ];
 
   const isActive = (path: string) => {

@@ -178,6 +178,58 @@ export const listingService = {
     return MOCK_LISTINGS.find((l) => l._id === id) || null;
   },
 
+  async createListing(payload: {
+    title: string;
+    description: string;
+    propertyType: PropertyType;
+    transactionType: 'vente' | 'location';
+    priceFCFA: number;
+    surfaceM2: number;
+    city: string;
+    district: string;
+    address: string;
+    titleType: LandTitleType;
+    titleNumber: string;
+    photos: string[];
+    hasWater?: boolean;
+    hasElectricity?: boolean;
+    hasRoadAccess?: boolean;
+    isFenced?: boolean;
+    contactName: string;
+    phoneCall: string;
+    phoneWhatsApp: string;
+    latitude?: number;
+    longitude?: number;
+  }): Promise<IListing> {
+    const newListing: IListing = {
+      _id: `lst-${Date.now()}`,
+      title: payload.title,
+      description: payload.description,
+      propertyType: payload.propertyType,
+      transactionType: payload.transactionType,
+      priceFCFA: payload.priceFCFA,
+      surfaceM2: payload.surfaceM2,
+      city: payload.city,
+      district: payload.district,
+      titleType: payload.titleType,
+      coordinates:
+        payload.latitude && payload.longitude
+          ? { latitude: payload.latitude, longitude: payload.longitude }
+          : undefined,
+      images:
+        payload.photos.length > 0
+          ? payload.photos
+          : ['https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800'],
+      contactPhone: payload.phoneCall,
+      contactWhatsApp: payload.phoneWhatsApp,
+      status: 'published',
+      userId: 'usr-current',
+      createdAt: new Date().toISOString(),
+    };
+    inMemoryListings = [newListing, ...inMemoryListings];
+    return newListing;
+  },
+
   async createAlert(payload: {
     label: string;
     propertyType: PropertyType;
