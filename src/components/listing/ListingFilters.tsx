@@ -3,7 +3,32 @@ import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
 import { PropertyType, LandTitleType } from '../../types';
 import { IVORY_COAST_LOCATIONS, LAND_TITLE_TYPES } from '../../theme/theme';
 import { GlassmorphismCard } from '../ui/GlassmorphismCard';
+import { CustomSelect, SelectOption } from '../ui/CustomSelect';
 import { ListingFiltersModal } from './ListingFiltersModal';
+
+const PROPERTY_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Tous les types' },
+  { value: 'terrain', label: 'Terrain / Parcelle' },
+  { value: 'maison', label: 'Maison / Villa' },
+  { value: 'appartement', label: 'Appartement' },
+  { value: 'commercial', label: 'Local Commercial' },
+];
+
+const TITLE_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Tous les titres' },
+  ...LAND_TITLE_TYPES.map((t) => ({
+    value: t.value,
+    label: t.value.toUpperCase(),
+    description: t.label,
+  })),
+];
+
+const SORT_OPTIONS: SelectOption[] = [
+  { value: 'recent', label: 'Plus récents' },
+  { value: 'price_asc', label: 'Prix croissant' },
+  { value: 'price_desc', label: 'Prix décroissant' },
+  { value: 'surface_desc', label: 'Plus grande surface' },
+];
 
 export interface ListingFilterValues {
   city: string;
@@ -147,98 +172,54 @@ export const ListingFilters: React.FC<ListingFiltersProps> = ({
 
         {/* Grille des sélecteurs */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-          {/* Ville */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Ville / Région
-            </label>
-            <select
-              value={filters.city}
-              onChange={(e) => onChange({ ...filters, city: e.target.value, district: '' })}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            >
-              <option value="">Toutes les villes</option>
-              {IVORY_COAST_LOCATIONS.map((l) => (
-                <option key={l.city} value={l.city}>
-                  {l.city}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Ville / Région"
+            value={filters.city}
+            onChange={(val) => onChange({ ...filters, city: String(val), district: '' })}
+            options={[
+              { value: '', label: 'Toutes les villes' },
+              ...IVORY_COAST_LOCATIONS.map((l) => ({ value: l.city, label: l.city })),
+            ]}
+            searchable={true}
+            modalTitle="Ville / Région"
+          />
 
-          {/* Commune */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Commune / Secteur
-            </label>
-            <select
-              value={filters.district}
-              onChange={(e) => onChange({ ...filters, district: e.target.value })}
-              disabled={activeDistricts.length === 0}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
-            >
-              <option value="">Toutes les communes</option>
-              {activeDistricts.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Commune / Secteur"
+            value={filters.district}
+            onChange={(val) => onChange({ ...filters, district: String(val) })}
+            options={[
+              { value: '', label: 'Toutes les communes' },
+              ...activeDistricts.map((d) => ({ value: d, label: d })),
+            ]}
+            searchable={true}
+            disabled={activeDistricts.length === 0}
+            modalTitle="Commune / Secteur"
+          />
 
-          {/* Titre Foncier */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Titre Foncier
-            </label>
-            <select
-              value={filters.titleType}
-              onChange={(e) => onChange({ ...filters, titleType: e.target.value as LandTitleType | '' })}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            >
-              <option value="">Tous les titres</option>
-              {LAND_TITLE_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.value.toUpperCase()}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Titre Foncier"
+            value={filters.titleType}
+            onChange={(val) => onChange({ ...filters, titleType: val as LandTitleType | '' })}
+            options={TITLE_OPTIONS}
+            modalTitle="Titre foncier requis"
+          />
 
-          {/* Type de bien */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Type de bien
-            </label>
-            <select
-              value={filters.propertyType}
-              onChange={(e) => onChange({ ...filters, propertyType: e.target.value as PropertyType | '' })}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            >
-              <option value="">Tous les types</option>
-              <option value="terrain">Terrain / Parcelle</option>
-              <option value="maison">Maison / Villa</option>
-              <option value="appartement">Appartement</option>
-              <option value="commercial">Local Commercial</option>
-            </select>
-          </div>
+          <CustomSelect
+            label="Type de bien"
+            value={filters.propertyType}
+            onChange={(val) => onChange({ ...filters, propertyType: val as PropertyType | '' })}
+            options={PROPERTY_OPTIONS}
+            modalTitle="Type de bien immobilier"
+          />
 
-          {/* Ordre d'affichage */}
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Ordre d’affichage
-            </label>
-            <select
-              value={filters.sort}
-              onChange={(e) => onChange({ ...filters, sort: e.target.value as typeof filters.sort })}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            >
-              <option value="recent">Plus récents</option>
-              <option value="price_asc">Prix croissant</option>
-              <option value="price_desc">Prix décroissant</option>
-              <option value="surface_desc">Plus grande surface</option>
-            </select>
-          </div>
+          <CustomSelect
+            label="Ordre d’affichage"
+            value={filters.sort}
+            onChange={(val) => onChange({ ...filters, sort: val as typeof filters.sort })}
+            options={SORT_OPTIONS}
+            modalTitle="Ordre d’affichage"
+          />
         </div>
 
         {/* Pied du panneau : Compteur & Réinitialisation */}

@@ -19,6 +19,9 @@ import { ProDetailPage } from './pages/ProDetailPage';
 import { ListingDetailPage } from './pages/ListingDetailPage';
 import { GlassmorphismDemoPage } from './pages/GlassmorphismDemoPage';
 
+// Pages Sprint 3
+import { CalculatorPage } from './pages/CalculatorPage';
+
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
@@ -44,11 +47,13 @@ export const App: React.FC = () => {
                   <Route path="/pros" element={<ProsPage />} />
                   <Route path="/pros/:id" element={<ProDetailPage />} />
 
+                  {/* SPRINT 3 (Outils Métiers & Opportunités) */}
+                  <Route path="/calculateur" element={<CalculatorPage />} />
+
                   {/* Banc d'essai Glassmorphism Design System */}
                   <Route path="/glassmorphism-demo" element={<GlassmorphismDemoPage />} />
 
                   {/* Redirections douces pour les sprints ultérieurs */}
-                  <Route path="/calculateur" element={<Navigate to="/verification" replace />} />
                   <Route path="/emplois" element={<Navigate to="/" replace />} />
                   <Route path="/blog" element={<Navigate to="/" replace />} />
                   <Route path="*" element={<Navigate to="/" replace />} />

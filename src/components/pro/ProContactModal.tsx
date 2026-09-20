@@ -5,11 +5,22 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useToast } from '../../contexts/ToastContext';
 
+import { CustomSelect, SelectOption } from '../ui/CustomSelect';
+
 interface ProContactModalProps {
   pro: IProProfile | null;
   isOpen: boolean;
   onClose: () => void;
 }
+
+const PROJECT_TYPE_OPTIONS: SelectOption[] = [
+  { value: 'Bornage / Topographie', label: 'Bornage contradictoire / Topographie', description: 'Délimitation officielle de parcelle, relevé altimétrique' },
+  { value: 'Plans d’architecture & Permis', label: 'Conception de plans & Permis de construire', description: 'Plans 2D/3D, dossier MCLU, permis de construire' },
+  { value: 'Gros Œuvre / Construction', label: 'Construction & Gros Œuvre', description: 'Fondations, béton armé, élévation, couverture' },
+  { value: 'Électricité & Énergie', label: 'Installation Électrique & Solaire', description: 'Câblage, tableau électrique, panneaux solaires' },
+  { value: 'Plomberie & Fluides', label: 'Plomberie & Assainissement', description: 'Alimentation eau, évacuation, fosse septique' },
+  { value: 'Autre demande', label: 'Autre prestation spécifique', description: 'Expertise foncière, audit de chantier ou conseil' },
+];
 
 export const ProContactModal: React.FC<ProContactModalProps> = ({ pro, isOpen, onClose }) => {
   const { showToast } = useToast();
@@ -143,23 +154,13 @@ export const ProContactModal: React.FC<ProContactModalProps> = ({ pro, isOpen, o
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="font-bold text-slate-700 dark:text-slate-300">
-                Nature de votre projet
-              </label>
-              <select
-                value={projectType}
-                onChange={(e) => setProjectType(e.target.value)}
-                className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-primary"
-              >
-                <option value="Bornage / Topographie">Bornage contradictoire / Topographie</option>
-                <option value="Plans d’architecture & Permis">Conception de plans & Permis de construire</option>
-                <option value="Gros Œuvre / Construction">Construction & Gros Œuvre</option>
-                <option value="Électricité & Énergie">Installation Électrique & Solaire</option>
-                <option value="Plomberie & Fluides">Plomberie & Assainissement</option>
-                <option value="Autre demande">Autre prestation spécifique</option>
-              </select>
-            </div>
+            <CustomSelect
+              label="Nature de votre projet"
+              value={projectType}
+              onChange={(val) => setProjectType(String(val))}
+              options={PROJECT_TYPE_OPTIONS}
+              modalTitle="Nature de votre projet"
+            />
 
             <div className="space-y-1">
               <label className="font-bold text-slate-700 dark:text-slate-300">

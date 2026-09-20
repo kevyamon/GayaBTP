@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Bell } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
+import { CustomSelect, SelectOption } from '../ui/CustomSelect';
 import { useToast } from '../../contexts/ToastContext';
 import { listingService } from '../../services/listing.service';
 import { PropertyType, LandTitleType } from '../../types';
@@ -13,6 +14,22 @@ interface CreateAlertModalProps {
   initialCity?: string;
   initialTitleType?: LandTitleType;
 }
+
+const PROPERTY_OPTIONS: SelectOption[] = [
+  { value: 'terrain', label: 'Terrain / Parcelle', description: 'Terrains à bâtir et lotissements' },
+  { value: 'maison', label: 'Villa / Maison', description: 'Villas individuelles et duplex' },
+  { value: 'appartement', label: 'Appartement', description: 'Logements en copropriété' },
+  { value: 'commercial', label: 'Local Commercial', description: 'Bureaux et espaces professionnels' },
+];
+
+const TITLE_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Tous les titres juridiques' },
+  ...LAND_TITLE_TYPES.map((t) => ({
+    value: t.value,
+    label: `${t.value.toUpperCase()} — ${t.label}`,
+    description: t.description,
+  })),
+];
 
 export const CreateAlertModal: React.FC<CreateAlertModalProps> = ({
   isOpen,
@@ -30,8 +47,27 @@ export const CreateAlertModal: React.FC<CreateAlertModalProps> = ({
   const [minSurfaceM2, setMinSurfaceM2] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const activeDistricts =
-    IVORY_COAST_LOCATIONS.find((l) => l.city === city)?.districts || [];
+  const activeDistricts = useMemo(() => {
+    return IVORY_COAST_LOCATIONS.find((l) => l.city === city)?.districts || [];
+  }, [city]);
+
+  const cityOptions: SelectOption[] = useMemo(() => {
+    return IVORY_COAST_LOCATIONS.map((l) => ({
+      value: l.city,
+      label: l.city,
+      description: `${l.districts.length} communes couvertes`,
+    }));
+  }, []);
+
+  const districtOptions: SelectOption[] = useMemo(() => {
+    return [
+      { value: '', label: 'Toute la ville' },
+      ...activeDistricts.map((d) => ({
+        value: d,
+        label: d,
+      })),
+    ];
+  }, [activeDistricts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,80 +120,45 @@ export const CreateAlertModal: React.FC<CreateAlertModalProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Type de bien
-            </label>
-            <select
-              value={propertyType}
-              onChange={(e) => setPropertyType(e.target.value as PropertyType)}
-              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary"
-            >
-              <option value="terrain">Terrain / Parcelle</option>
-              <option value="maison">Villa / Maison</option>
-              <option value="appartement">Appartement</option>
-              <option value="commercial">Local Commercial</option>
-            </select>
-          </div>
+          <CustomSelect
+            label="Type de bien"
+            value={propertyType}
+            onChange={(val) => setPropertyType(val as PropertyType)}
+            options={PROPERTY_OPTIONS}
+            modalTitle="Type de bien immobilier"
+          />
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Titre juridique requis
-            </label>
-            <select
-              value={titleType}
-              onChange={(e) => setTitleType(e.target.value as LandTitleType | '')}
-              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary"
-            >
-              <option value="">Tous les titres</option>
-              {LAND_TITLE_TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Titre juridique requis"
+            value={titleType}
+            onChange={(val) => setTitleType(val as LandTitleType | '')}
+            options={TITLE_OPTIONS}
+            modalTitle="Titre juridique requis"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Ville
-            </label>
-            <select
-              value={city}
-              onChange={(e) => {
-                setCity(e.target.value);
-                setDistrict('');
-              }}
-              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary"
-            >
-              {IVORY_COAST_LOCATIONS.map((l) => (
-                <option key={l.city} value={l.city}>
-                  {l.city}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Ville"
+            value={city}
+            onChange={(val) => {
+              setCity(String(val));
+              setDistrict('');
+            }}
+            options={cityOptions}
+            searchable={true}
+            modalTitle="Ville"
+          />
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-              Commune / Zone
-            </label>
-            <select
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              disabled={activeDistricts.length === 0}
-              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
-            >
-              <option value="">Toute la ville</option>
-              {activeDistricts.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Commune / Zone"
+            value={district}
+            onChange={(val) => setDistrict(String(val))}
+            options={districtOptions}
+            searchable={true}
+            disabled={activeDistricts.length === 0}
+            modalTitle="Commune / Zone"
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -170,7 +171,7 @@ export const CreateAlertModal: React.FC<CreateAlertModalProps> = ({
               value={maxPriceFCFA}
               onChange={(e) => setMaxPriceFCFA(e.target.value)}
               placeholder="Ex : 20000000"
-              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary"
+              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary focus:outline-none"
             />
           </div>
 
@@ -183,7 +184,7 @@ export const CreateAlertModal: React.FC<CreateAlertModalProps> = ({
               value={minSurfaceM2}
               onChange={(e) => setMinSurfaceM2(e.target.value)}
               placeholder="Ex : 500"
-              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary"
+              className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark px-3 py-2 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-brand-primary focus:outline-none"
             />
           </div>
         </div>

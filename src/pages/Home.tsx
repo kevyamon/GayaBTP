@@ -9,7 +9,30 @@ import { Footer } from '../components/common/Footer';
 import { listingService } from '../services/listing.service';
 import { IListing, PropertyType, LandTitleType } from '../types';
 import { IVORY_COAST_LOCATIONS, LAND_TITLE_TYPES } from '../theme/theme';
+import { CustomSelect, SelectOption } from '../components/ui/CustomSelect';
 import s1bg from '../assets/s1bg.png';
+
+const PROPERTY_OPTIONS: SelectOption[] = [
+  { value: 'terrain', label: 'Terrain / Parcelle', description: 'Terrains à bâtir et lotissements viabilisés' },
+  { value: 'maison', label: 'Villa / Maison', description: 'Villas individuelles, duplex et résidences' },
+  { value: 'appartement', label: 'Appartement', description: 'Logements en copropriété' },
+  { value: 'commercial', label: 'Local Commercial', description: 'Bureaux, commerces et entrepôts' },
+];
+
+const CITY_OPTIONS: SelectOption[] = IVORY_COAST_LOCATIONS.map((l) => ({
+  value: l.city,
+  label: l.city,
+  description: `${l.districts.length} communes & secteurs`,
+}));
+
+const TITLE_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Tous les titres fonciers' },
+  ...LAND_TITLE_TYPES.map((t) => ({
+    value: t.value,
+    label: t.value.toUpperCase(),
+    description: t.label,
+  })),
+];
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -118,56 +141,33 @@ export const Home: React.FC = () => {
             <div className="mt-10 max-w-5xl mx-auto bg-white/95 dark:bg-brand-dark-surface/95 backdrop-blur-md p-4 sm:p-6 rounded-brand-xl shadow-elevated dark:shadow-elevated-dark border border-brand-light-border dark:border-brand-dark-border">
               <form onSubmit={handleSearch} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
                 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Type de bien
-                  </label>
-                  <select
-                    value={propertyType}
-                    onChange={(e) => setPropertyType(e.target.value as PropertyType)}
-                    className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark px-3 py-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-                  >
-                    <option value="terrain">Terrain / Parcelle</option>
-                    <option value="maison">Villa / Maison</option>
-                    <option value="appartement">Appartement</option>
-                    <option value="commercial">Local Commercial</option>
-                  </select>
-                </div>
+                <CustomSelect
+                  label="Type de bien"
+                  value={propertyType}
+                  onChange={(val) => setPropertyType(val as PropertyType)}
+                  options={PROPERTY_OPTIONS}
+                  modalTitle="Type de bien immobilier"
+                  modalSubtitle="Filtrer les annonces par typologie de propriété"
+                />
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Ville / Commune
-                  </label>
-                  <select
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark px-3 py-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-                  >
-                    {IVORY_COAST_LOCATIONS.map((l) => (
-                      <option key={l.city} value={l.city}>
-                        {l.city}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  label="Ville / Commune"
+                  value={city}
+                  onChange={(val) => setCity(val)}
+                  options={CITY_OPTIONS}
+                  searchable={true}
+                  modalTitle="Ville / Région"
+                  modalSubtitle="Sélectionnez une zone géographique en Côte d’Ivoire"
+                />
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    Titre foncier requis
-                  </label>
-                  <select
-                    value={titleType}
-                    onChange={(e) => setTitleType(e.target.value as LandTitleType | '')}
-                    className="w-full text-sm rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark px-3 py-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-                  >
-                    <option value="">Tous les titres</option>
-                    {LAND_TITLE_TYPES.map((t) => (
-                      <option key={t.value} value={t.value}>
-                        {t.value.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <CustomSelect
+                  label="Titre foncier requis"
+                  value={titleType}
+                  onChange={(val) => setTitleType(val as LandTitleType | '')}
+                  options={TITLE_OPTIONS}
+                  modalTitle="Titre foncier requis"
+                  modalSubtitle="Sélectionnez le niveau de sécurité juridique souhaité"
+                />
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">

@@ -4,6 +4,7 @@ import { ProFilterParams } from '../../services/pro.service';
 import { GlassmorphismCard } from '../ui/GlassmorphismCard';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
+import { CustomSelect, SelectOption } from '../ui/CustomSelect';
 
 interface ProFiltersProps {
   filters: ProFilterParams;
@@ -12,25 +13,25 @@ interface ProFiltersProps {
   totalResults: number;
 }
 
-const SPECIALTY_OPTIONS = [
+const SPECIALTY_OPTIONS: SelectOption[] = [
   { value: 'all', label: 'Toutes les spécialités' },
-  { value: 'Géomètre-Expert', label: 'Géomètres-Experts (OGECI)' },
-  { value: 'Architecte', label: 'Architectes (CNOA)' },
-  { value: 'Gros Œuvre', label: 'Gros Œuvre, Maçonnerie & VRD' },
-  { value: 'Électricité', label: 'Électricité Bâtiment & Solaire' },
-  { value: 'Plomberie', label: 'Plomberie & Fluides Sanitaires' },
-  { value: 'Topographie', label: 'Topographie & Bornage Foncier' },
-  { value: 'Suivi de Chantier', label: 'Maîtrise d’Œuvre & Contrôle' },
+  { value: 'Géomètre-Expert', label: 'Géomètres-Experts (OGECI)', description: 'Bornage contradictoire, plans de morcellement et délimitation' },
+  { value: 'Architecte', label: 'Architectes (CNOA)', description: 'Conception de plans, permis de construire et suivi esthétique' },
+  { value: 'Gros Œuvre', label: 'Gros Œuvre, Maçonnerie & VRD', description: 'Fondations, béton armé, élévation et voiries' },
+  { value: 'Électricité', label: 'Électricité Bâtiment & Solaire', description: 'Installations basse tension, coffrets et énergie solaire' },
+  { value: 'Plomberie', label: 'Plomberie & Fluides Sanitaires', description: 'Réseaux d’évacuation, adduction d’eau et sanitaires' },
+  { value: 'Topographie', label: 'Topographie & Bornage Foncier', description: 'Relevés altimétriques, implantations et géodésie' },
+  { value: 'Suivi de Chantier', label: 'Maîtrise d’Œuvre & Contrôle', description: 'Supervision technique, coordination et réception de travaux' },
 ];
 
-const CITY_OPTIONS = [
+const CITY_OPTIONS: SelectOption[] = [
   { value: 'all', label: 'Toutes les villes & communes' },
-  { value: 'Abidjan', label: 'Abidjan (Toutes communes)' },
-  { value: 'Grand-Bassam', label: 'Grand-Bassam' },
-  { value: 'Yamoussoukro', label: 'Yamoussoukro' },
-  { value: 'San-Pédro', label: 'San-Pédro' },
-  { value: 'Bouaké', label: 'Bouaké' },
-  { value: 'Korhogo', label: 'Korhogo' },
+  { value: 'Abidjan', label: 'Abidjan (Toutes communes)', description: 'Cocody, Marcory, Yopougon, Plateau, Bingerville...' },
+  { value: 'Grand-Bassam', label: 'Grand-Bassam', description: 'Zone balnéaire et littoral sud' },
+  { value: 'Yamoussoukro', label: 'Yamoussoukro', description: 'Capitale politique et région du Bélier' },
+  { value: 'San-Pédro', label: 'San-Pédro', description: 'Pôle portuaire du Sud-Ouest' },
+  { value: 'Bouaké', label: 'Bouaké', description: 'Région du Gbêkê et centre' },
+  { value: 'Korhogo', label: 'Korhogo', description: 'Région des Savanes et nord' },
 ];
 
 export const ProFilters: React.FC<ProFiltersProps> = ({
@@ -52,14 +53,6 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
     onChange({ ...filters, search: e.target.value });
   };
 
-  const handleSpecialtyChange = (val: string) => {
-    onChange({ ...filters, specialty: val });
-  };
-
-  const handleCityChange = (val: string) => {
-    onChange({ ...filters, city: val });
-  };
-
   const handleAccountTypeChange = (type: 'all' | 'entreprise' | 'artisan') => {
     onChange({ ...filters, accountType: type === 'all' ? undefined : type });
   };
@@ -75,8 +68,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
     Boolean(filters.verifiedOnly),
   ].filter(Boolean).length;
 
-  const hasActiveFilters =
-    Boolean(filters.search) || activeFiltersCount > 0;
+  const hasActiveFilters = Boolean(filters.search) || activeFiltersCount > 0;
 
   const handleApplyMobileFilters = () => {
     onChange(tempFilters);
@@ -111,7 +103,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
           <button
             type="button"
             onClick={() => setIsMobileModalOpen(true)}
-            className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-brand font-bold text-xs bg-white dark:bg-brand-dark-surface border border-brand-light-border dark:border-brand-dark-border text-slate-800 dark:text-slate-100 hover:border-brand-primary shadow-sm active:scale-[0.98] transition-all"
+            className="flex-1 inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-brand font-bold text-xs bg-white dark:bg-brand-dark-surface border border-brand-light-border dark:border-brand-dark-border text-slate-800 dark:text-slate-100 hover:border-brand-primary shadow-sm active:scale-[0.98] transition-all cursor-pointer"
           >
             <SlidersHorizontal className="w-4 h-4 text-brand-primary shrink-0" />
             <span>Filtrer les professionnels</span>
@@ -126,7 +118,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
             <button
               type="button"
               onClick={onReset}
-              className="inline-flex items-center gap-1 py-2.5 px-3 rounded-brand text-xs font-bold text-brand-urgent hover:bg-brand-urgent/10 transition-colors border border-brand-urgent/30"
+              className="inline-flex items-center gap-1 py-2.5 px-3 rounded-brand text-xs font-bold text-brand-urgent hover:bg-brand-urgent/10 transition-colors border border-brand-urgent/30 cursor-pointer"
               title="Réinitialiser tous les filtres"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -149,46 +141,31 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
         maxWidth="md"
       >
         <div className="space-y-4 text-xs">
-          {/* Spécialité */}
-          <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Corps d’état / Spécialité</label>
-            <select
-              value={tempFilters.specialty || 'all'}
-              onChange={(e) => setTempFilters({ ...tempFilters, specialty: e.target.value })}
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-            >
-              {SPECIALTY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Corps d’état / Spécialité"
+            value={tempFilters.specialty || 'all'}
+            onChange={(val) => setTempFilters({ ...tempFilters, specialty: String(val) })}
+            options={SPECIALTY_OPTIONS}
+            searchable={true}
+            modalTitle="Spécialité BTP"
+          />
 
-          {/* Zone Géographique */}
-          <div className="space-y-1">
-            <label className="font-bold text-slate-700 dark:text-slate-300">Zone Géographique</label>
-            <select
-              value={tempFilters.city || 'all'}
-              onChange={(e) => setTempFilters({ ...tempFilters, city: e.target.value })}
-              className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-            >
-              {CITY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Zone Géographique"
+            value={tempFilters.city || 'all'}
+            onChange={(val) => setTempFilters({ ...tempFilters, city: String(val) })}
+            options={CITY_OPTIONS}
+            searchable={true}
+            modalTitle="Zone Géographique"
+          />
 
-          {/* Type de Prestataire */}
           <div className="space-y-1">
             <label className="font-bold text-slate-700 dark:text-slate-300">Type de Prestataire</label>
             <div className="flex rounded-brand border border-brand-light-border dark:border-brand-dark-border p-1 bg-slate-50 dark:bg-brand-dark">
               <button
                 type="button"
                 onClick={() => setTempFilters({ ...tempFilters, accountType: undefined })}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded cursor-pointer ${
                   !tempFilters.accountType
                     ? 'bg-brand-secondary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400'
@@ -199,7 +176,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
               <button
                 type="button"
                 onClick={() => setTempFilters({ ...tempFilters, accountType: 'entreprise' })}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded cursor-pointer ${
                   tempFilters.accountType === 'entreprise'
                     ? 'bg-brand-secondary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400'
@@ -210,7 +187,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
               <button
                 type="button"
                 onClick={() => setTempFilters({ ...tempFilters, accountType: 'artisan' })}
-                className={`flex-1 py-1.5 text-xs font-semibold rounded ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded cursor-pointer ${
                   tempFilters.accountType === 'artisan'
                     ? 'bg-brand-secondary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400'
@@ -221,12 +198,11 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
             </div>
           </div>
 
-          {/* Case Vérifiés Uniquement */}
           <div className="pt-2">
             <button
               type="button"
               onClick={() => setTempFilters({ ...tempFilters, verifiedOnly: !tempFilters.verifiedOnly })}
-              className="inline-flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 select-none"
+              className="inline-flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300 select-none cursor-pointer"
             >
               {tempFilters.verifiedOnly ? (
                 <CheckSquare className="w-4 h-4 text-emerald-600" />
@@ -237,7 +213,6 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
             </button>
           </div>
 
-          {/* Actions de validation dans la modale */}
           <div className="pt-4 border-t border-brand-light-border dark:border-brand-dark-border flex items-center justify-between gap-3">
             <Button
               type="button"
@@ -276,39 +251,23 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Corps d’état / Spécialité
-            </label>
-            <select
-              value={filters.specialty || 'all'}
-              onChange={(e) => handleSpecialtyChange(e.target.value)}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            >
-              {SPECIALTY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Corps d’état / Spécialité"
+            value={filters.specialty || 'all'}
+            onChange={(val) => onChange({ ...filters, specialty: String(val) })}
+            options={SPECIALTY_OPTIONS}
+            searchable={true}
+            modalTitle="Corps d’état / Spécialité"
+          />
 
-          <div className="space-y-1">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Zone Géographique
-            </label>
-            <select
-              value={filters.city || 'all'}
-              onChange={(e) => handleCityChange(e.target.value)}
-              className="w-full px-3 py-2 rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark text-slate-800 dark:text-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            >
-              {CITY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <CustomSelect
+            label="Zone Géographique"
+            value={filters.city || 'all'}
+            onChange={(val) => onChange({ ...filters, city: String(val) })}
+            options={CITY_OPTIONS}
+            searchable={true}
+            modalTitle="Zone Géographique"
+          />
 
           <div className="space-y-1 sm:col-span-2 lg:col-span-1">
             <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -318,7 +277,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
               <button
                 type="button"
                 onClick={() => handleAccountTypeChange('all')}
-                className={`flex-1 py-1 text-xs font-semibold rounded ${
+                className={`flex-1 py-1 text-xs font-semibold rounded cursor-pointer ${
                   !filters.accountType
                     ? 'bg-brand-secondary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -329,7 +288,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
               <button
                 type="button"
                 onClick={() => handleAccountTypeChange('entreprise')}
-                className={`flex-1 py-1 text-xs font-semibold rounded ${
+                className={`flex-1 py-1 text-xs font-semibold rounded cursor-pointer ${
                   filters.accountType === 'entreprise'
                     ? 'bg-brand-secondary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -340,7 +299,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
               <button
                 type="button"
                 onClick={() => handleAccountTypeChange('artisan')}
-                className={`flex-1 py-1 text-xs font-semibold rounded ${
+                className={`flex-1 py-1 text-xs font-semibold rounded cursor-pointer ${
                   filters.accountType === 'artisan'
                     ? 'bg-brand-secondary text-white shadow-sm'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -356,7 +315,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
           <button
             type="button"
             onClick={toggleVerifiedOnly}
-            className="inline-flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300 hover:text-brand-primary transition-colors select-none"
+            className="inline-flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300 hover:text-brand-primary transition-colors select-none cursor-pointer"
           >
             {filters.verifiedOnly ? (
               <CheckSquare className="w-4 h-4 text-emerald-600" />
@@ -374,7 +333,7 @@ export const ProFilters: React.FC<ProFiltersProps> = ({
               <button
                 type="button"
                 onClick={onReset}
-                className="inline-flex items-center gap-1 text-brand-urgent hover:underline font-bold"
+                className="inline-flex items-center gap-1 text-brand-urgent hover:underline font-bold cursor-pointer"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>Réinitialiser</span>

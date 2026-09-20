@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { RotateCcw, Check } from 'lucide-react';
 import { PropertyType, LandTitleType } from '../../types';
 import { IVORY_COAST_LOCATIONS, LAND_TITLE_TYPES } from '../../theme/theme';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
+import { CustomSelect, SelectOption } from '../ui/CustomSelect';
 import { ListingFilterValues } from './ListingFilters';
 
 interface ListingFiltersModalProps {
@@ -15,6 +16,30 @@ interface ListingFiltersModalProps {
   onReset: () => void;
 }
 
+const PROPERTY_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Tous les types de biens' },
+  { value: 'terrain', label: 'Terrain / Parcelle', description: 'Terrains à bâtir et lotissements' },
+  { value: 'maison', label: 'Maison / Villa', description: 'Villas individuelles et duplex' },
+  { value: 'appartement', label: 'Appartement', description: 'Logements en copropriété' },
+  { value: 'commercial', label: 'Local Commercial', description: 'Bureaux et espaces commerciaux' },
+];
+
+const TITLE_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Tous les titres fonciers' },
+  ...LAND_TITLE_TYPES.map((t) => ({
+    value: t.value,
+    label: `${t.value.toUpperCase()} — ${t.label}`,
+    description: t.description,
+  })),
+];
+
+const SORT_OPTIONS: SelectOption[] = [
+  { value: 'recent', label: 'Plus récents en premier' },
+  { value: 'price_asc', label: 'Prix croissant (du - cher au + cher)' },
+  { value: 'price_desc', label: 'Prix décroissant' },
+  { value: 'surface_desc', label: 'Plus grande superficie' },
+];
+
 export const ListingFiltersModal: React.FC<ListingFiltersModalProps> = ({
   isOpen,
   onClose,
@@ -23,8 +48,30 @@ export const ListingFiltersModal: React.FC<ListingFiltersModalProps> = ({
   onApply,
   onReset,
 }) => {
-  const activeDistricts =
-    IVORY_COAST_LOCATIONS.find((l) => l.city === tempFilters.city)?.districts || [];
+  const activeDistricts = useMemo(() => {
+    return IVORY_COAST_LOCATIONS.find((l) => l.city === tempFilters.city)?.districts || [];
+  }, [tempFilters.city]);
+
+  const cityOptions: SelectOption[] = useMemo(() => {
+    return [
+      { value: '', label: 'Toutes les villes' },
+      ...IVORY_COAST_LOCATIONS.map((l) => ({
+        value: l.city,
+        label: l.city,
+        description: `${l.districts.length} communes / secteurs`,
+      })),
+    ];
+  }, []);
+
+  const districtOptions: SelectOption[] = useMemo(() => {
+    return [
+      { value: '', label: 'Toutes les communes' },
+      ...activeDistricts.map((d) => ({
+        value: d,
+        label: d,
+      })),
+    ];
+  }, [activeDistricts]);
 
   return (
     <Modal
@@ -36,107 +83,74 @@ export const ListingFiltersModal: React.FC<ListingFiltersModalProps> = ({
     >
       <div className="space-y-4 text-xs">
         {/* Ville / Région */}
-        <div className="space-y-1">
-          <label className="font-bold text-slate-700 dark:text-slate-300">Ville / Région</label>
-          <select
-            value={tempFilters.city}
-            onChange={(e) =>
-              setTempFilters({ ...tempFilters, city: e.target.value, district: '' })
-            }
-            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-          >
-            <option value="">Toutes les villes</option>
-            {IVORY_COAST_LOCATIONS.map((l) => (
-              <option key={l.city} value={l.city}>
-                {l.city}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CustomSelect
+          label="Ville / Région"
+          value={tempFilters.city}
+          onChange={(val) =>
+            setTempFilters({ ...tempFilters, city: String(val), district: '' })
+          }
+          options={cityOptions}
+          searchable={true}
+          modalTitle="Ville / Région"
+        />
 
         {/* Commune / Secteur */}
-        <div className="space-y-1">
-          <label className="font-bold text-slate-700 dark:text-slate-300">Commune / Secteur</label>
-          <select
-            value={tempFilters.district}
-            onChange={(e) => setTempFilters({ ...tempFilters, district: e.target.value })}
-            disabled={activeDistricts.length === 0}
-            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium disabled:opacity-50 focus:ring-2 focus:ring-brand-primary"
-          >
-            <option value="">Toutes les communes</option>
-            {activeDistricts.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CustomSelect
+          label="Commune / Secteur"
+          value={tempFilters.district}
+          onChange={(val) => setTempFilters({ ...tempFilters, district: String(val) })}
+          options={districtOptions}
+          searchable={true}
+          disabled={activeDistricts.length === 0}
+          modalTitle="Commune / Secteur"
+        />
 
         {/* Titre Foncier */}
-        <div className="space-y-1">
-          <label className="font-bold text-slate-700 dark:text-slate-300">Titre Foncier Requis</label>
-          <select
-            value={tempFilters.titleType}
-            onChange={(e) =>
-              setTempFilters({ ...tempFilters, titleType: e.target.value as LandTitleType | '' })
-            }
-            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-          >
-            <option value="">Tous les titres juridiques</option>
-            {LAND_TITLE_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.value.toUpperCase()} — {t.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CustomSelect
+          label="Titre Foncier Requis"
+          value={tempFilters.titleType}
+          onChange={(val) =>
+            setTempFilters({ ...tempFilters, titleType: val as LandTitleType | '' })
+          }
+          options={TITLE_OPTIONS}
+          modalTitle="Titre foncier requis"
+        />
 
         {/* Type de bien */}
-        <div className="space-y-1">
-          <label className="font-bold text-slate-700 dark:text-slate-300">Type de bien</label>
-          <select
-            value={tempFilters.propertyType}
-            onChange={(e) =>
-              setTempFilters({ ...tempFilters, propertyType: e.target.value as PropertyType | '' })
-            }
-            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-          >
-            <option value="">Tous les types de biens</option>
-            <option value="terrain">Terrain / Parcelle</option>
-            <option value="maison">Maison / Villa</option>
-            <option value="appartement">Appartement</option>
-            <option value="commercial">Local Commercial</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Type de bien"
+          value={tempFilters.propertyType}
+          onChange={(val) =>
+            setTempFilters({ ...tempFilters, propertyType: val as PropertyType | '' })
+          }
+          options={PROPERTY_OPTIONS}
+          modalTitle="Type de bien immobilier"
+        />
 
         {/* Budget maximum */}
         <div className="space-y-1">
-          <label className="font-bold text-slate-700 dark:text-slate-300">Budget Maximum (FCFA)</label>
+          <label className="font-bold text-slate-700 dark:text-slate-300">
+            Budget Maximum (FCFA)
+          </label>
           <input
             type="number"
             placeholder="Ex : 50 000 000"
             value={tempFilters.maxPrice}
             onChange={(e) => setTempFilters({ ...tempFilters, maxPrice: e.target.value })}
-            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
+            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
           />
         </div>
 
         {/* Ordre d'affichage */}
-        <div className="space-y-1">
-          <label className="font-bold text-slate-700 dark:text-slate-300">Ordre d’affichage</label>
-          <select
-            value={tempFilters.sort}
-            onChange={(e) =>
-              setTempFilters({ ...tempFilters, sort: e.target.value as typeof tempFilters.sort })
-            }
-            className="w-full text-xs rounded-brand border border-brand-light-border dark:border-brand-dark-border bg-slate-50 dark:bg-brand-dark p-2.5 text-slate-900 dark:text-slate-100 font-medium focus:ring-2 focus:ring-brand-primary"
-          >
-            <option value="recent">Plus récents en premier</option>
-            <option value="price_asc">Prix croissant (du - cher au + cher)</option>
-            <option value="price_desc">Prix décroissant</option>
-            <option value="surface_desc">Plus grande surface</option>
-          </select>
-        </div>
+        <CustomSelect
+          label="Ordre d’affichage"
+          value={tempFilters.sort}
+          onChange={(val) =>
+            setTempFilters({ ...tempFilters, sort: val as typeof tempFilters.sort })
+          }
+          options={SORT_OPTIONS}
+          modalTitle="Ordre d’affichage"
+        />
 
         {/* Actions de validation */}
         <div className="pt-4 border-t border-brand-light-border dark:border-brand-dark-border flex items-center justify-between gap-3">
