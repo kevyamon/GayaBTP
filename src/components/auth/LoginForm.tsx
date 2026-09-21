@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { SocialAuthButtons } from './SocialAuthButtons';
+import { triggerGoogleSignIn } from '../../services/googleAuth';
 
 interface LoginFormProps {
   onForgotPasswordClick: (email: string) => void;
@@ -12,13 +13,14 @@ interface LoginFormProps {
 export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, setUserSession } = useAuth();
   const { success, error } = useToast();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
@@ -49,9 +51,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
   };
 
   const handleGoogleAuth = () => {
-    success(
-      'Connexion Google',
-      'Authentification avec votre compte Google en cours de traitement.'
+    setIsGoogleLoading(true);
+    triggerGoogleSignIn(
+      (authData) => {
+        setUserSession(authData.user, authData.tokens.accessToken, authData.proProfile);
+        success(
+          'Connexion Google réussie !',
+          `Bienvenue ${authData.user.name || ''} sur GayaBTP.`
+        );
+        setIsGoogleLoading(false);
+        navigate(redirectTo);
+      },
+      (errMsg) => {
+        error(errMsg);
+        setIsGoogleLoading(false);
+      }
     );
   };
 
@@ -112,7 +126,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
         {/* Bouton Principal de Connexion (Pill Noir Arrondi) */}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || isGoogleLoading}
           className="w-full mt-2 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-bold text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.98] disabled:opacity-60"
         >
           {isLoading ? (
@@ -134,6 +148,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
         actionText="Continuer avec Google"
         separatorText="ou continuer avec"
         onGoogleClick={handleGoogleAuth}
+        isLoading={isGoogleLoading}
       />
 
       {/* Lien vers Inscription */}

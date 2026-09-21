@@ -8,6 +8,7 @@ import { SocialAuthButtons } from './SocialAuthButtons';
 import { RoleSelectorModal } from './RoleSelectorModal';
 import { RoleQuickSelector } from './RoleQuickSelector';
 import { QuickRoleType } from '../../types/roles';
+import { triggerGoogleSignIn } from '../../services/googleAuth';
 
 export const RegisterForm: React.FC = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ export const RegisterForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
@@ -92,6 +94,25 @@ export const RegisterForm: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleAuth = () => {
+    setIsGoogleLoading(true);
+    triggerGoogleSignIn(
+      (authData) => {
+        setUserSession(authData.user, authData.tokens.accessToken, authData.proProfile);
+        success(
+          'Inscription Google réussie !',
+          `Bienvenue ${authData.user.name || ''} sur GayaBTP.`
+        );
+        setIsGoogleLoading(false);
+        navigate(redirectTo);
+      },
+      (errMsg) => {
+        error(errMsg);
+        setIsGoogleLoading(false);
+      }
+    );
   };
 
   return (
@@ -208,7 +229,7 @@ export const RegisterForm: React.FC = () => {
         {/* Bouton Créer mon compte (Pill Noir Arrondi) */}
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || isGoogleLoading}
           className="w-full mt-1.5 py-3.5 px-6 rounded-full bg-slate-950 hover:bg-slate-900 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-bold text-xs sm:text-sm shadow-xl flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-[0.98] disabled:opacity-60"
         >
           {isLoading ? (
@@ -226,7 +247,12 @@ export const RegisterForm: React.FC = () => {
       </form>
 
       {/* Authentification Google */}
-      <SocialAuthButtons actionText="Continuer avec Google" separatorText="ou s’inscrire avec" />
+      <SocialAuthButtons
+        actionText="Continuer avec Google"
+        separatorText="ou s’inscrire avec"
+        onGoogleClick={handleGoogleAuth}
+        isLoading={isGoogleLoading}
+      />
 
       {/* Lien vers Connexion */}
       <div className="pt-0.5 text-center text-xs text-slate-600 dark:text-slate-400">

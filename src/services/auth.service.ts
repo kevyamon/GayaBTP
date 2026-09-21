@@ -62,6 +62,24 @@ export const authService = {
     }
   },
 
+  async loginWithGoogle(idToken: string): Promise<AuthSuccessData> {
+    try {
+      const response = await api.post<ApiResponse<AuthSuccessData>>('/auth/google', {
+        idToken,
+      });
+      if (response.data.success && response.data.data) {
+        setAccessToken(response.data.data.tokens.accessToken);
+        return response.data.data;
+      }
+      throw new Error(response.data.message || 'Échec de l’authentification avec Google.');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      throw new Error(
+        error.response?.data?.message || error.message || 'Connexion Google impossible.'
+      );
+    }
+  },
+
   async registerParticulier(payload: RegisterParticulierPayload): Promise<AuthSuccessData> {
     try {
       const response = await api.post<ApiResponse<AuthSuccessData>>(
