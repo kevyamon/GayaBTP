@@ -7,7 +7,7 @@ import { authService } from '../../services/auth.service';
 import { SocialAuthButtons } from './SocialAuthButtons';
 import { RoleSelectorModal } from './RoleSelectorModal';
 import { RoleQuickSelector } from './RoleQuickSelector';
-import { QuickRoleType } from '../../types/roles';
+import { RoleCategory } from '../../types/roles';
 import { triggerGoogleSignIn } from '../../services/googleAuth';
 
 export const RegisterForm: React.FC = () => {
@@ -16,7 +16,7 @@ export const RegisterForm: React.FC = () => {
   const { setUserSession } = useAuth();
   const { success, error } = useToast();
 
-  const [selectedQuickType, setSelectedQuickType] = useState<QuickRoleType['id']>('particulier');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('particulier');
   const [selectedRole, setSelectedRole] = useState<string>('Propriétaire ou acheteur particulier');
   const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
 
@@ -33,16 +33,15 @@ export const RegisterForm: React.FC = () => {
   const searchParams = new URLSearchParams(location.search);
   const redirectTo = searchParams.get('redirect') || '/dashboard';
 
-  const handleQuickTypeSelect = (typeId: QuickRoleType['id']) => {
-    setSelectedQuickType(typeId);
-    if (typeId === 'particulier') {
+  const handleCategorySelect = (category: RoleCategory) => {
+    setSelectedCategoryId(category.id);
+    if (category.id === 'particulier') {
       setSelectedRole('Propriétaire ou acheteur particulier');
-    } else if (typeId === 'geometre') {
-      setSelectedRole('Géomètre-expert');
-    } else if (typeId === 'entreprise') {
-      setSelectedRole('Entreprise générale de construction');
+      setIsRoleModalOpen(false);
     } else {
-      setSelectedRole('Ingénieur en génie civil');
+      setSelectedRole(category.roles[0]);
+      // Ouverture automatique de la modale pour choisir son métier précis dans la catégorie
+      setIsRoleModalOpen(true);
     }
   };
 
@@ -59,7 +58,7 @@ export const RegisterForm: React.FC = () => {
 
     setIsLoading(true);
     try {
-      if (selectedQuickType === 'particulier') {
+      if (selectedCategoryId === 'particulier') {
         const data = await authService.registerParticulier({
           name: name.trim(),
           email: email.trim().toLowerCase(),
@@ -72,12 +71,8 @@ export const RegisterForm: React.FC = () => {
           name: name.trim(),
           email: email.trim().toLowerCase(),
           password,
-          accountType:
-            selectedQuickType === 'entreprise'
-              ? 'entreprise'
-              : selectedQuickType === 'geometre'
-                ? 'cabinet'
-                : 'artisan',
+          category: selectedCategoryId,
+          accountType: selectedCategoryId === 'artisans_chantier' ? 'entreprise' : 'cabinet',
           companyName: name.trim(),
           specialties: [selectedRole],
           city: city.trim(),
@@ -111,32 +106,35 @@ export const RegisterForm: React.FC = () => {
       (errMsg) => {
         error(errMsg);
         setIsGoogleLoading(false);
+      },
+      () => {
+        setIsGoogleLoading(false);
       }
     );
   };
 
   return (
     <div className="space-y-3.5">
-      {/* 1. Sélecteur Rapide de Rôle Modulaire */}
+      {/* 1. Carrousel des 10 Catégories officielles Rôles.pdf */}
       <RoleQuickSelector
-        selectedQuickType={selectedQuickType}
+        selectedCategoryId={selectedCategoryId}
         selectedRole={selectedRole}
-        onSelectQuickType={handleQuickTypeSelect}
+        onSelectCategory={handleCategorySelect}
         onOpenRoleModal={() => setIsRoleModalOpen(true)}
       />
 
       {/* 2. Formulaire d'Informations */}
       <form onSubmit={handleSubmit} className="space-y-2.5">
-        {/* Champ Nom */}
+        {/* Champ Nom / Raison Sociale */}
         <div className="relative">
           <User className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             required
             placeholder={
-              selectedQuickType === 'entreprise'
-                ? 'Nom de l’entreprise ou raison sociale'
-                : 'Nom complet'
+              selectedCategoryId === 'particulier'
+                ? 'Nom et prénoms complets'
+                : 'Nom complet ou raison sociale'
             }
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -157,8 +155,8 @@ export const RegisterForm: React.FC = () => {
           />
         </div>
 
-        {/* Champs Téléphone et Ville (pour les pros et particuliers) */}
-        {selectedQuickType !== 'particulier' && (
+        {/* Champs Téléphone et Ville (pour tous les profils professionnels) */}
+        {selectedCategoryId !== 'particulier' && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 animate-in fade-in duration-200">
             <div className="relative">
               <Phone className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -265,10 +263,11 @@ export const RegisterForm: React.FC = () => {
         </Link>
       </div>
 
-      {/* Modale de Sélection des Spécialités BTP */}
+      {/* Modale de Sélection des Métiers (Exclusive à la catégorie active) */}
       <RoleSelectorModal
         isOpen={isRoleModalOpen}
         onClose={() => setIsRoleModalOpen(false)}
+        categoryId={selectedCategoryId}
         selectedRole={selectedRole}
         onSelectRole={(role) => setSelectedRole(role)}
       />

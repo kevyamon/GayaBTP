@@ -17,7 +17,8 @@ export interface RegisterProPayload {
   name: string;
   email: string;
   password: string;
-  accountType: 'entreprise' | 'cabinet' | 'artisan' | 'independant' | 'bureau_etude';
+  category: string;
+  accountType?: string;
   companyName: string;
   specialties: string[];
   city: string;

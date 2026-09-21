@@ -65,6 +65,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
       (errMsg) => {
         error(errMsg);
         setIsGoogleLoading(false);
+      },
+      () => {
+        setIsGoogleLoading(false);
       }
     );
   };
