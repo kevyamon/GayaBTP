@@ -165,19 +165,8 @@ export const BottomNav: React.FC = () => {
                 key={item.path}
                 ref={active ? activeItemRef : undefined}
                 to={item.path}
-                onClick={(e) => {
-                  handleTabClick(e, item.path);
-                  if (isHome) secretTrigger.handlers.onClick(e);
-                }}
-                {...(isHome
-                  ? {
-                      onMouseDown: secretTrigger.handlers.onMouseDown,
-                      onMouseUp: secretTrigger.handlers.onMouseUp,
-                      onMouseLeave: secretTrigger.handlers.onMouseLeave,
-                      onTouchStart: secretTrigger.handlers.onTouchStart,
-                      onTouchEnd: secretTrigger.handlers.onTouchEnd,
-                    }
-                  : {})}
+                onClick={(e) => handleTabClick(e, item.path)}
+                {...(isHome ? secretTrigger.handlers : {})}
                 aria-label={item.label}
                 aria-current={active ? 'page' : undefined}
                 title={item.label}
