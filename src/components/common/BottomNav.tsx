@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
+import { useSecretAdminTrigger } from '../../hooks/useSecretAdminTrigger';
 
 interface NavItem {
   readonly label: string;
@@ -33,6 +34,13 @@ export const BottomNav: React.FC = () => {
   const [isFooterVisible, setIsFooterVisible] = useState<boolean>(false);
   const [canScrollLeft, setCanScrollLeft] = useState<boolean>(false);
   const [canScrollRight, setCanScrollRight] = useState<boolean>(true);
+
+  const secretTrigger = useSecretAdminTrigger({
+    requiredHoldSeconds: 10,
+    onTrigger: () => {
+      window.dispatchEvent(new CustomEvent('gayabtp:open-admin-auth'));
+    },
+  });
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeItemRef = useRef<HTMLAnchorElement>(null);
@@ -150,13 +158,26 @@ export const BottomNav: React.FC = () => {
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const active = isRouteActive(item.path);
+            const isHome = item.path === '/';
 
             return (
               <Link
                 key={item.path}
                 ref={active ? activeItemRef : undefined}
                 to={item.path}
-                onClick={(e) => handleTabClick(e, item.path)}
+                onClick={(e) => {
+                  handleTabClick(e, item.path);
+                  if (isHome) secretTrigger.handlers.onClick(e);
+                }}
+                {...(isHome
+                  ? {
+                      onMouseDown: secretTrigger.handlers.onMouseDown,
+                      onMouseUp: secretTrigger.handlers.onMouseUp,
+                      onMouseLeave: secretTrigger.handlers.onMouseLeave,
+                      onTouchStart: secretTrigger.handlers.onTouchStart,
+                      onTouchEnd: secretTrigger.handlers.onTouchEnd,
+                    }
+                  : {})}
                 aria-label={item.label}
                 aria-current={active ? 'page' : undefined}
                 title={item.label}
@@ -181,6 +202,12 @@ export const BottomNav: React.FC = () => {
                 >
                   {item.label}
                 </span>
+                {isHome && secretTrigger.isHolding && (
+                  <span
+                    className="absolute bottom-1 left-2 right-2 h-0.5 bg-brand-primary rounded-full transition-all duration-100"
+                    style={{ width: `${secretTrigger.progress}%` }}
+                  />
+                )}
               </Link>
             );
           })}

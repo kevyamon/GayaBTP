@@ -18,6 +18,7 @@ import {
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '../ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSecretAdminTrigger } from '../../hooks/useSecretAdminTrigger';
 
 export const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,6 +27,13 @@ export const Header: React.FC = () => {
   const navScrollRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const { isAuthenticated, user } = useAuth();
+
+  const secretTrigger = useSecretAdminTrigger({
+    requiredHoldSeconds: 10,
+    onTrigger: () => {
+      window.dispatchEvent(new CustomEvent('gayabtp:open-admin-auth'));
+    },
+  });
 
   const navLinks = [
     { name: 'Accueil', path: '/', icon: Home },
@@ -108,11 +116,14 @@ export const Header: React.FC = () => {
               {navLinks.map((link) => {
                 const Icon = link.icon;
                 const active = isActive(link.path);
+                const isHome = link.path === '/';
+
                 return (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`flex items-center gap-1.5 xl:gap-2 px-3 xl:px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ease-out shrink-0 select-none ${
+                    {...(isHome ? secretTrigger.handlers : {})}
+                    className={`relative flex items-center gap-1.5 xl:gap-2 px-3 xl:px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 ease-out shrink-0 select-none ${
                       active
                         ? 'bg-white dark:bg-brand-dark text-brand-primary shadow-sm scale-[1.02]'
                         : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-brand-dark/40'
@@ -120,6 +131,12 @@ export const Header: React.FC = () => {
                   >
                     <Icon className={`w-3.5 h-3.5 xl:w-4 xl:h-4 ${active ? 'stroke-[2.5px] text-brand-primary' : 'stroke-2'}`} />
                     <span>{link.name}</span>
+                    {isHome && secretTrigger.isHolding && (
+                      <span
+                        className="absolute bottom-0 left-2 right-2 h-0.5 bg-brand-primary rounded-full transition-all duration-100"
+                        style={{ width: `${secretTrigger.progress}%` }}
+                      />
+                    )}
                   </Link>
                 );
               })}
