@@ -65,7 +65,8 @@ export const RegisterForm: React.FC = () => {
           password,
           phone: phone.trim() || undefined,
         });
-        setUserSession(data.user, data.tokens.accessToken);
+        const token = data.accessToken || data.tokens?.accessToken || '';
+        setUserSession(data.user, token);
       } else {
         const data = await authService.registerPro({
           name: name.trim(),
@@ -78,7 +79,8 @@ export const RegisterForm: React.FC = () => {
           city: city.trim(),
           phoneWhatsApp: phone.trim() || '+225 00000000',
         });
-        setUserSession(data.user, data.tokens.accessToken, data.proProfile);
+        const token = data.accessToken || data.tokens?.accessToken || '';
+        setUserSession(data.user, token, data.proProfile);
       }
 
       success('Bienvenue sur GayaBTP !', 'Votre compte a été créé avec succès.');
@@ -95,11 +97,9 @@ export const RegisterForm: React.FC = () => {
     setIsGoogleLoading(true);
     triggerGoogleSignIn(
       (authData) => {
-        setUserSession(authData.user, authData.tokens.accessToken, authData.proProfile);
-        success(
-          'Inscription Google réussie !',
-          `Bienvenue ${authData.user.name || ''} sur GayaBTP.`
-        );
+        const token = authData.accessToken || authData.tokens?.accessToken || '';
+        setUserSession(authData.user, token, authData.proProfile);
+        success('Inscription Google réussie !', `Bienvenue ${authData.user.name || ''} sur GayaBTP.`);
         setIsGoogleLoading(false);
         navigate(redirectTo);
       },
@@ -107,9 +107,7 @@ export const RegisterForm: React.FC = () => {
         error(errMsg);
         setIsGoogleLoading(false);
       },
-      () => {
-        setIsGoogleLoading(false);
-      }
+      () => setIsGoogleLoading(false)
     );
   };
 

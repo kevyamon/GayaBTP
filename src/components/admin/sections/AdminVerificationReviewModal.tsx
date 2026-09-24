@@ -6,11 +6,11 @@ import {
   ExternalLink,
   CheckCircle,
   XCircle,
-  AlertTriangle,
   Loader2,
   Trash2,
 } from 'lucide-react';
 import { IVerificationItem } from '../../../services/admin.service';
+
 
 interface AdminVerificationReviewModalProps {
   verification: IVerificationItem | null;

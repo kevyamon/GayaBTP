@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Search,
-  Filter,
   Eye,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Archive,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -21,7 +16,7 @@ export const AdminListingsSection: React.FC = () => {
 
   const [listings, setListings] = useState<IListing[]>([]);
   const [pagination, setPagination] = useState<IPagination>({ page: 1, limit: 15, total: 0, totalPages: 1 });
-  const [statusFilter, setStatusFilter] = useState<string>('pending');
+  const [statusFilter, setStatusFilter] = useState<string>('pending_review');
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -45,7 +40,7 @@ export const AdminListingsSection: React.FC = () => {
     loadListings(1);
   }, [loadListings]);
 
-  const handleModerate = async (listingId: string, status: 'active' | 'rejected' | 'archived') => {
+  const handleModerate = async (listingId: string, status: 'published' | 'rejected' | 'archived') => {
     try {
       await adminService.moderateListing(listingId, status);
       success('Statut de l’annonce actualisé avec succès.');
@@ -91,8 +86,8 @@ export const AdminListingsSection: React.FC = () => {
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
         {[
           { id: '', label: 'Toutes' },
-          { id: 'pending', label: 'En attente' },
-          { id: 'active', label: 'Validées' },
+          { id: 'pending_review', label: 'En attente' },
+          { id: 'published', label: 'Validées' },
           { id: 'rejected', label: 'Rejetées' },
           { id: 'archived', label: 'Archivées' },
         ].map((tab) => (
@@ -128,7 +123,7 @@ export const AdminListingsSection: React.FC = () => {
               <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200/80 dark:border-white/10 text-slate-500 dark:text-slate-400 font-bold uppercase text-[10px] tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4">Annonce</th>
-                  <th className="py-3.5 px-4">Lieu & Titre</th>
+                  <th className="py-3.5 px-4">Lieu &amp; Titre</th>
                   <th className="py-3.5 px-4">Prix (FCFA)</th>
                   <th className="py-3.5 px-4">Statut</th>
                   <th className="py-3.5 px-4 text-right">Actions</th>
@@ -140,32 +135,42 @@ export const AdminListingsSection: React.FC = () => {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         <img
-                          src={item.photos?.[0] || '/logo.png'}
+                          src={item.images?.[0] || '/logo.png'}
                           alt={item.title}
                           className="w-10 h-10 rounded-xl object-cover border border-slate-200 dark:border-white/10"
                         />
                         <div className="max-w-[200px]">
                           <p className="font-bold text-slate-900 dark:text-white truncate">{item.title}</p>
-                          <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">{item.category}</p>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400 capitalize">{item.propertyType}</p>
                         </div>
                       </div>
                     </td>
                     <td className="py-3 px-4">
                       <p className="font-semibold text-slate-800 dark:text-slate-200">{item.city}</p>
-                      <p className="text-[10px] font-bold text-brand-secondary uppercase">{item.legalStatus || 'ACD'}</p>
+                      <p className="text-[10px] font-bold text-brand-secondary uppercase">{item.titleType || 'ACD'}</p>
                     </td>
                     <td className="py-3 px-4 font-bold text-slate-900 dark:text-white">
                       {item.priceFCFA.toLocaleString('fr-FR')}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        item.status === 'active'
+                        item.status === 'published' || item.status === 'active'
                           ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                          : item.status === 'pending'
+                          : item.status === 'pending' || item.status === 'pending_review' || item.status === 'draft'
                           ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          : item.status === 'archived'
+                          ? 'bg-slate-500/10 text-slate-600 dark:text-slate-400'
                           : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                       }`}>
-                        {item.status === 'active' ? 'En ligne' : item.status === 'pending' ? 'En attente' : 'Rejetée'}
+                        {item.status === 'published' || item.status === 'active'
+                          ? 'En ligne'
+                          : item.status === 'pending' || item.status === 'pending_review' || item.status === 'draft'
+                          ? 'En attente'
+                          : item.status === 'archived'
+                          ? 'Archivée'
+                          : item.status === 'sold'
+                          ? 'Vendue'
+                          : 'Rejetée'}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -227,3 +232,4 @@ export const AdminListingsSection: React.FC = () => {
     </div>
   );
 };
+

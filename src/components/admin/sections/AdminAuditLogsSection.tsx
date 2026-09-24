@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  FileText,
-  Shield,
-  Clock,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -12,6 +9,7 @@ import {
 import { adminService, IAuditLogItem } from '../../../services/admin.service';
 import { IPagination } from '../../../types';
 import { useToast } from '../../../contexts/ToastContext';
+
 
 export const AdminAuditLogsSection: React.FC = () => {
   const { error } = useToast();

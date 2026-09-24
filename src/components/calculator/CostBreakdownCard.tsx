@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Landmark, FileText, Check, Copy, Share2, Calculator } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import { CalculatorResult } from '../../services/calculator.service';
+
 import { GlassmorphismCard } from '../ui/GlassmorphismCard';
 import { formatFCFA } from '../../theme/theme';
 import { useToast } from '../../contexts/ToastContext';

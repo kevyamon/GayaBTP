@@ -1,20 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  ShieldCheck,
-  Search,
   Eye,
-  CheckCircle,
-  XCircle,
-  Clock,
   ChevronLeft,
   ChevronRight,
   Loader2,
-  FileCheck,
 } from 'lucide-react';
 import { adminService, IVerificationItem } from '../../../services/admin.service';
 import { IPagination } from '../../../types';
 import { AdminVerificationReviewModal } from './AdminVerificationReviewModal';
 import { useToast } from '../../../contexts/ToastContext';
+
 
 export const AdminVerificationsSection: React.FC = () => {
   const { success, error } = useToast();

@@ -2,17 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
   CreditCard,
   Search,
-  CheckCircle,
-  XCircle,
-  Clock,
   ChevronLeft,
   ChevronRight,
   Loader2,
-  ShieldAlert,
 } from 'lucide-react';
 import { adminService, IPaymentItem } from '../../../services/admin.service';
 import { IPagination } from '../../../types';
 import { useToast } from '../../../contexts/ToastContext';
+
 
 export const AdminPaymentsSection: React.FC = () => {
   const { error } = useToast();

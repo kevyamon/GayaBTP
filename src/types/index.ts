@@ -6,6 +6,10 @@ export interface IUser {
   name: string;
   email: string;
   phone?: string;
+  avatar?: string;
+  coverImage?: string;
+  city?: string;
+  bio?: string;
   role: UserRole;
   status: UserStatus;
   createdAt: string;
@@ -40,26 +44,65 @@ export interface IProProfile {
   bio?: string;
   yearsOfExperience?: number;
   isVerified: boolean;
-  verificationStatus: 'not_requested' | 'pending' | 'verified' | 'rejected';
+  verificationStatus: 'not_requested' | 'pending' | 'verified' | 'rejected' | 'approved';
   hasProBadge: boolean;
+  subscriptionPlan?: string;
   avatarUrl?: string;
   coverUrl?: string;
+  coverImage?: string;
   completedProjectsCount?: number;
   services?: IProServiceItem[];
   portfolio?: IProProjectItem[];
 }
 
-export type PropertyType = 'terrain' | 'maison' | 'appartement' | 'immeuble' | 'commercial';
+export type PropertyType =
+  | 'terrain'
+  | 'terrain_nu'
+  | 'terrain_villageois'
+  | 'maison'
+  | 'villa'
+  | 'cite'
+  | 'appartement'
+  | 'immeuble'
+  | 'commercial'
+  | 'commerce';
+
 export type TransactionType = 'vente' | 'location';
-export type LandTitleType = 'ACD' | 'CMP' | 'approbation' | 'bail_emphytéotique' | 'autre';
-export type ListingStatus = 'published' | 'pending' | 'rejected' | 'sold';
+
+export type LandTitleType =
+  | 'ACD'
+  | 'CMP'
+  | 'approbation'
+  | 'arrete_concession'
+  | 'lettre_attribution'
+  | 'bail_emphytéotique'
+  | 'autre';
+
+export type ListingStatus =
+  | 'draft'
+  | 'pending_review'
+  | 'published'
+  | 'rejected'
+  | 'suspended'
+  | 'archived'
+  | 'active'
+  | 'pending'
+  | 'sold';
+
+export interface IListingOwner {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role?: string;
+}
 
 export interface IListing {
   _id: string;
   title: string;
   description: string;
   propertyType: PropertyType;
-  transactionType: TransactionType;
+  transactionType?: TransactionType;
   priceFCFA: number;
   surfaceM2: number;
   city: string;
@@ -67,15 +110,20 @@ export interface IListing {
   neighborhood?: string;
   titleType: LandTitleType;
   coordinates?: {
-    latitude: number;
-    longitude: number;
+    latitude?: number;
+    longitude?: number;
+    lat?: number;
+    lng?: number;
   };
   images: string[];
-  contactPhone: string;
+  contactPhone?: string;
   contactWhatsApp?: string;
   status: ListingStatus;
-  userId: string;
+  userId?: string;
+  ownerId?: string | IListingOwner;
+  publishedAt?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface IPortal {
@@ -102,19 +150,22 @@ export interface IAlert {
   createdAt: string;
 }
 
+export interface IPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
   message?: string;
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+  pagination?: IPagination;
   error?: {
     code: string;
     message: string;
     details?: Array<{ field: string; message: string }>;
   };
 }
+

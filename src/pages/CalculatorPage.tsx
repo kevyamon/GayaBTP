@@ -22,7 +22,7 @@ export const CalculatorPage: React.FC = () => {
   }, [formValues]);
 
   return (
-    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-16 space-y-8 overflow-hidden">
+    <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-36 sm:pb-40 lg:pb-16 space-y-8 overflow-hidden">
       {/* Orbes ambiants diffus pour la réfraction du verre dépoli */}
       <div className="absolute top-16 left-12 w-96 h-96 rounded-full bg-brand-accent/20 dark:bg-brand-accent/15 blur-3xl pointer-events-none -z-10" />
       <div className="absolute top-1/3 right-12 w-96 h-96 rounded-full bg-brand-primary/15 dark:bg-brand-primary/15 blur-3xl pointer-events-none -z-10" />

@@ -54,7 +54,8 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onForgotPasswordClick }) =
     setIsGoogleLoading(true);
     triggerGoogleSignIn(
       (authData) => {
-        setUserSession(authData.user, authData.tokens.accessToken, authData.proProfile);
+        const token = authData.accessToken || authData.tokens?.accessToken || '';
+        setUserSession(authData.user, token, authData.proProfile);
         success(
           'Connexion Google réussie !',
           `Bienvenue ${authData.user.name || ''} sur GayaBTP.`

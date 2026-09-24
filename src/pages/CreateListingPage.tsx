@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ArrowLeft } from 'lucide-react';
 import { GlassmorphismCard } from '../components/ui/GlassmorphismCard';
 import { Button } from '../components/ui/Button';
 import { useToast } from '../contexts/ToastContext';
@@ -99,7 +99,19 @@ export const CreateListingPage: React.FC = () => {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 pt-6 pb-28 lg:pb-16 space-y-6 sm:space-y-8 overflow-hidden w-full">
+    <div className="relative max-w-4xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-36 sm:pb-40 lg:pb-16 space-y-5 sm:space-y-6 overflow-hidden w-full">
+      {/* Bouton Retour */}
+      <div className="flex items-center justify-between relative z-10">
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-brand-primary dark:hover:text-sky-300 transition-colors cursor-pointer"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Retour</span>
+        </button>
+      </div>
+
       {/* Orbes ambiants diffus */}
       <div className="absolute top-12 left-10 w-80 h-80 rounded-full bg-brand-primary/15 dark:bg-brand-primary/10 blur-3xl pointer-events-none -z-10" />
       <div className="absolute top-1/2 right-8 w-80 h-80 rounded-full bg-brand-accent/15 dark:bg-brand-accent/10 blur-3xl pointer-events-none -z-10" />

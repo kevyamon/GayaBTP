@@ -15,7 +15,7 @@ const STEPS = [
 
 export const ListingStepperHeader: React.FC<StepperProps> = ({ currentStep, onStepClick }) => {
   return (
-    <div className="w-full overflow-hidden px-1">
+    <div className="w-full pt-3 pb-2 px-1">
       <div className="flex items-center justify-between relative max-w-full">
         {/* Ligne de progression d'arrière-plan */}
         <div className="absolute left-2 right-2 top-4 sm:top-5 -translate-y-1/2 h-0.5 sm:h-1 bg-slate-200 dark:bg-slate-800 -z-0" />

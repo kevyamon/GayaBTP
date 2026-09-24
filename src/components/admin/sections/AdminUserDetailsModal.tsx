@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import {
   X,
   User,
-  Mail,
   Phone,
-  Shield,
   Ban,
-  CheckCircle,
-  AlertTriangle,
-  Loader2,
   Calendar,
 } from 'lucide-react';
 import { IUser } from '../../../types';
+
 
 interface AdminUserDetailsModalProps {
   user: IUser | null;

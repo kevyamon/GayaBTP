@@ -11,7 +11,7 @@ export const getAccessToken = (): string | null => accessToken;
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'https://gayabtp-backend.onrender.com/api/v1',
   withCredentials: true,
-  timeout: 4500,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -75,7 +75,7 @@ api.interceptors.response.use(
           { withCredentials: true }
         );
 
-        const newAccessToken = data.data.accessToken;
+        const newAccessToken = data.data?.accessToken || data.data?.tokens?.accessToken;
         setAccessToken(newAccessToken);
         processQueue(null, newAccessToken);
 

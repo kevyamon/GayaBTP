@@ -28,9 +28,11 @@ import { CalculatorPage } from './pages/CalculatorPage';
 import { CreateListingPage } from './pages/CreateListingPage';
 import { JobsPage } from './pages/JobsPage';
 
-// Pages Sprint 4 (Authentification)
+// Pages Sprint 4 (Authentification & Espace Utilisateur)
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { UserDashboardPage } from './pages/UserDashboardPage';
+import { AuthGuard } from './components/auth/AuthGuard';
 
 const AppContent: React.FC = () => {
   const location = useLocation();
@@ -78,9 +80,18 @@ const AppContent: React.FC = () => {
           <Route path="/publier" element={<CreateListingPage />} />
           <Route path="/emplois" element={<JobsPage />} />
 
-          {/* SPRINT 4 (Authentification) */}
+          {/* SPRINT 4 (Authentification & Espace Personnel) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route
+            path="/dashboard"
+            element={
+              <AuthGuard>
+                <UserDashboardPage />
+              </AuthGuard>
+            }
+          />
+          <Route path="/mon-compte" element={<Navigate to="/dashboard" replace />} />
 
           {/* SPRINT 8 (Back-Office Administrateur Forteresse & Protection 404) */}
           <Route path="/cockpit-system" element={<AdminDashboardPage />} />

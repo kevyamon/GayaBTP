@@ -41,17 +41,23 @@ export interface ResetPasswordPayload {
 export interface AuthSuccessData {
   user: IUser;
   proProfile?: IProProfile;
-  tokens: {
+  accessToken?: string;
+  tokens?: {
     accessToken: string;
   };
 }
+
+const extractToken = (data: AuthSuccessData): string => {
+  return data.accessToken || data.tokens?.accessToken || '';
+};
 
 export const authService = {
   async login(payload: LoginPayload): Promise<AuthSuccessData> {
     try {
       const response = await api.post<ApiResponse<AuthSuccessData>>('/auth/login', payload);
       if (response.data.success && response.data.data) {
-        setAccessToken(response.data.data.tokens.accessToken);
+        const token = extractToken(response.data.data);
+        if (token) setAccessToken(token);
         return response.data.data;
       }
       throw new Error(response.data.message || 'Identifiants de connexion invalides.');
@@ -69,7 +75,8 @@ export const authService = {
         idToken,
       });
       if (response.data.success && response.data.data) {
-        setAccessToken(response.data.data.tokens.accessToken);
+        const token = extractToken(response.data.data);
+        if (token) setAccessToken(token);
         return response.data.data;
       }
       throw new Error(response.data.message || 'Échec de l’authentification avec Google.');
@@ -88,7 +95,8 @@ export const authService = {
         payload
       );
       if (response.data.success && response.data.data) {
-        setAccessToken(response.data.data.tokens.accessToken);
+        const token = extractToken(response.data.data);
+        if (token) setAccessToken(token);
         return response.data.data;
       }
       throw new Error(response.data.message || 'Impossible de créer votre compte particulier.');
@@ -104,7 +112,8 @@ export const authService = {
     try {
       const response = await api.post<ApiResponse<AuthSuccessData>>('/auth/register/pro', payload);
       if (response.data.success && response.data.data) {
-        setAccessToken(response.data.data.tokens.accessToken);
+        const token = extractToken(response.data.data);
+        if (token) setAccessToken(token);
         return response.data.data;
       }
       throw new Error(response.data.message || 'Impossible de créer votre compte professionnel.');
@@ -171,6 +180,26 @@ export const authService = {
       return null;
     } catch {
       return null;
+    }
+  },
+
+  async updateProfile(
+    payload: Partial<IUser & { companyName?: string; specialties?: string[]; phoneWhatsApp?: string }>
+  ): Promise<{ user: IUser; proProfile?: IProProfile }> {
+    try {
+      const response = await api.patch<ApiResponse<{ user: IUser; proProfile?: IProProfile }>>(
+        '/auth/me',
+        payload
+      );
+      if (response.data.success && response.data.data) {
+        return response.data.data;
+      }
+      throw new Error(response.data.message || 'Échec de mise à jour du profil.');
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      throw new Error(
+        error.response?.data?.message || error.message || 'Erreur lors de la mise à jour.'
+      );
     }
   },
 };

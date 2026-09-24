@@ -1,14 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  adminService,
-  DashboardStats,
-  IVerificationItem,
-  IPaymentItem,
-  IAuditLogItem,
-} from '../services/admin.service';
-import { IUser, IListing, IPagination } from '../types';
+import { adminService, DashboardStats } from '../services/admin.service';
+import { IListing } from '../types';
 import { clientSocketService } from '../services/socket.service';
 import { useToast } from '../contexts/ToastContext';
+
 
 export type AdminSection =
   | 'kpis'

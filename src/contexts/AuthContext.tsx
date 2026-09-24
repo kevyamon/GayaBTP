@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   setUserSession: (user: IUser, token: string, proProfile?: IProProfile) => void;
+  updateUserProfile: (payload: Partial<IUser & { companyName?: string; specialties?: string[]; phoneWhatsApp?: string }>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,10 +46,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (newProProfile) setProProfile(newProProfile);
   };
 
+  const updateUserProfile = async (
+    payload: Partial<IUser & { companyName?: string; specialties?: string[]; phoneWhatsApp?: string }>
+  ) => {
+    const { data } = await api.patch('/auth/me', payload);
+    if (data.success && data.data) {
+      if (data.data.user) setUser(data.data.user);
+      if (data.data.proProfile) setProProfile(data.data.proProfile);
+    }
+  };
+
   const login = async (email: string, password: string) => {
     const { data } = await api.post('/auth/login', { email, password });
     if (data.success && data.data) {
-      setUserSession(data.data.user, data.data.tokens.accessToken, data.data.proProfile);
+      const token = data.data.accessToken || data.data.tokens?.accessToken || '';
+      setUserSession(data.data.user, token, data.data.proProfile);
     }
   };
 
@@ -72,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         setUserSession,
+        updateUserProfile,
       }}
     >
       {children}

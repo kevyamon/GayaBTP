@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Users,
   Search,
   Settings,
-  Shield,
-  UserCheck,
-  UserX,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -60,8 +56,7 @@ export const AdminUsersSection: React.FC = () => {
       success('Statut utilisateur mis à jour.');
       loadUsers(pagination.page);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erreur lors de la mise à jour.';
-      error(msg);
+      error(err instanceof Error ? err.message : 'Erreur lors de la mise à jour.');
     }
   };
 
@@ -71,8 +66,7 @@ export const AdminUsersSection: React.FC = () => {
       success('Rôle utilisateur modifié.');
       loadUsers(pagination.page);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erreur lors du changement de rôle.';
-      error(msg);
+      error(err instanceof Error ? err.message : 'Erreur lors du changement de rôle.');
     }
   };
 
@@ -82,8 +76,7 @@ export const AdminUsersSection: React.FC = () => {
       success('Utilisateur banni avec succès.');
       loadUsers(pagination.page);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erreur lors du bannissement.';
-      error(msg);
+      error(err instanceof Error ? err.message : 'Erreur lors du bannissement.');
     }
   };
 
@@ -93,7 +86,7 @@ export const AdminUsersSection: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
-            Gestion des Utilisateurs & Rôles
+            Gestion des Utilisateurs &amp; Rôles
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Annuaire des particuliers, entreprises et administrateurs GayaBTP
@@ -113,27 +106,50 @@ export const AdminUsersSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Filtres par Rôle */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
-        {[
-          { id: '', label: 'Tous les rôles' },
-          { id: 'particulier', label: 'Particuliers' },
-          { id: 'professionnel', label: 'Professionnels BTP' },
-          { id: 'admin', label: 'Administrateurs' },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setRoleFilter(tab.id)}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
-              roleFilter === tab.id
-                ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm'
-                : 'bg-white/60 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white/90 border border-slate-200/80 dark:border-white/10'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Filtres par Rôle & Statut */}
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          {[
+            { id: '', label: 'Tous les rôles' },
+            { id: 'particulier', label: 'Particuliers' },
+            { id: 'professionnel', label: 'Professionnels BTP' },
+            { id: 'admin', label: 'Administrateurs' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setRoleFilter(tab.id)}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                roleFilter === tab.id
+                  ? 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 shadow-sm'
+                  : 'bg-white/60 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white/90 border border-slate-200/80 dark:border-white/10'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+          {[
+            { id: '', label: 'Tous statuts' },
+            { id: 'active', label: 'Actifs' },
+            { id: 'suspended', label: 'Suspendus' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setStatusFilter(tab.id)}
+              className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                statusFilter === tab.id
+                  ? 'bg-brand-secondary text-white shadow-sm'
+                  : 'bg-white/60 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-white/90 border border-slate-200/80 dark:border-white/10'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tableau des utilisateurs */}
@@ -250,3 +266,4 @@ export const AdminUsersSection: React.FC = () => {
     </div>
   );
 };
+

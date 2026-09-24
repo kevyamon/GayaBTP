@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
   Search,
@@ -12,8 +12,10 @@ import {
   PlusCircle,
   UserCheck,
   LogIn,
+  LogOut,
   Menu,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '../ui/Button';
@@ -26,7 +28,8 @@ export const Header: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const navScrollRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, logout } = useAuth();
 
   const secretTrigger = useSecretAdminTrigger({
     requiredHoldSeconds: 10,
@@ -76,26 +79,38 @@ export const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-40 w-full bg-white/95 dark:bg-brand-dark/95 backdrop-blur-md border-b border-brand-light-border dark:border-brand-dark-border">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3">
           
-          {/* Logo Officiel GayaBTP Arrondi */}
-          <Link to="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden ring-2 ring-brand-primary/25 dark:ring-white/15 shadow-sm flex items-center justify-center bg-white dark:bg-brand-dark-surface shrink-0 group-hover:scale-105 transition-transform duration-200">
-              <img
-                src="/logo.png"
-                alt="Logo GayaBTP"
-                className="w-full h-full object-cover rounded-full"
-              />
-            </div>
-            <span className="font-title text-2xl sm:text-3xl tracking-wide text-brand-secondary dark:text-white leading-none">
-              Gaya<span className="text-brand-primary">BTP</span>
-            </span>
-          </Link>
+          {/* Bouton Retour Mobile + Logo Officiel */}
+          <div className="flex items-center gap-2 shrink-0">
+            {location.pathname !== '/' && (
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="p-1.5 rounded-full text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-brand-dark-surface transition-colors lg:hidden"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
 
-          {/* Navigation Bureau — Style TabBar Épuré avec Défilement Fluide */}
+            <Link to="/" className="flex items-center gap-2 group shrink-0">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full overflow-hidden ring-2 ring-brand-primary/25 dark:ring-white/15 shadow-sm flex items-center justify-center bg-white dark:bg-brand-dark-surface shrink-0 group-hover:scale-105 transition-transform duration-200">
+                <img
+                  src="/logo.png"
+                  alt="Logo GayaBTP"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+              <span className="font-title text-xl sm:text-3xl tracking-wide text-brand-secondary dark:text-white leading-none">
+                Gaya<span className="text-brand-primary">BTP</span>
+              </span>
+            </Link>
+          </div>
+
+          {/* Navigation Bureau — Style TabBar Épuré */}
           <div className="hidden lg:flex items-center relative flex-1 max-w-md xl:max-w-xl 2xl:max-w-2xl bg-slate-100/90 dark:bg-brand-dark-surface/90 border border-brand-light-border dark:border-brand-dark-border rounded-full p-1 shadow-sm backdrop-blur-md mx-2">
-            {/* Flèche de défilement vers la gauche */}
             {canScrollLeft && (
               <button
                 type="button"
@@ -107,7 +122,6 @@ export const Header: React.FC = () => {
               </button>
             )}
 
-            {/* Conteneur défilant des onglets */}
             <nav
               ref={navScrollRef}
               onScroll={updateScrollState}
@@ -131,18 +145,11 @@ export const Header: React.FC = () => {
                   >
                     <Icon className={`w-3.5 h-3.5 xl:w-4 xl:h-4 ${active ? 'stroke-[2.5px] text-brand-primary' : 'stroke-2'}`} />
                     <span>{link.name}</span>
-                    {isHome && secretTrigger.isHolding && (
-                      <span
-                        className="absolute bottom-0 left-2 right-2 h-0.5 bg-brand-primary rounded-full transition-all duration-100"
-                        style={{ width: `${secretTrigger.progress}%` }}
-                      />
-                    )}
                   </Link>
                 );
               })}
             </nav>
 
-            {/* Flèche de défilement vers la droite */}
             {canScrollRight && (
               <button
                 type="button"
@@ -186,7 +193,7 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Contrôles Mobile : Toggle Thème + Bouton Hamburger */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-1.5 lg:hidden">
             <ThemeToggle />
             <button
               type="button"
@@ -201,22 +208,64 @@ export const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Menu Déroulant Mobile */}
+      {/* Menu Déroulant Mobile Amélioré & Non-Redondant */}
       {isMobileMenuOpen && (
         <div className="lg:hidden border-b border-brand-light-border dark:border-brand-dark-border bg-white dark:bg-brand-dark-surface animate-in slide-in-from-top-2 duration-200 shadow-elevated">
-          <div className="px-4 py-5 flex flex-col gap-3">
+          <div className="px-4 py-4 flex flex-col gap-2">
+            
+            {/* Liens de Navigation */}
+            <div className="grid grid-cols-2 gap-1.5 pb-2 border-b border-slate-100 dark:border-white/10">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const active = isActive(link.path);
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold ${
+                      active
+                        ? 'bg-brand-primary text-white shadow-sm'
+                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-brand-dark'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{link.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Actions Primaires */}
             <Link to="/publier" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button variant="primary" fullWidth leftIcon={<PlusCircle className="w-4 h-4" />} className="shadow-md">
+              <Button variant="primary" fullWidth leftIcon={<PlusCircle className="w-4 h-4" />} className="shadow-md text-xs sm:text-sm">
                 Publier une annonce
               </Button>
             </Link>
 
             {isAuthenticated ? (
-              <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
-                <Button variant="outline" fullWidth leftIcon={<UserCheck className="w-4 h-4" />}>
-                  Mon Espace GayaBTP
+              <div className="flex flex-col gap-2 pt-1">
+                {location.pathname !== '/dashboard' && (
+                  <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" fullWidth leftIcon={<UserCheck className="w-4 h-4" />}>
+                      Mon Espace ({user?.name.split(' ')[0]})
+                    </Button>
+                  </Link>
+                )}
+                <Button
+                  variant="outline"
+                  fullWidth
+                  leftIcon={<LogOut className="w-4 h-4 text-rose-500" />}
+                  onClick={async () => {
+                    setIsMobileMenuOpen(false);
+                    await logout();
+                    navigate('/');
+                  }}
+                  className="text-rose-600 border-rose-200 dark:border-rose-900/40"
+                >
+                  Se déconnecter
                 </Button>
-              </Link>
+              </div>
             ) : (
               <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="outline" fullWidth leftIcon={<LogIn className="w-4 h-4" />}>
@@ -230,3 +279,4 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+

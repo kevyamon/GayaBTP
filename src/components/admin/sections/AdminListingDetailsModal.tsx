@@ -12,13 +12,13 @@ import {
   Archive,
   Loader2,
 } from 'lucide-react';
-import { IListing } from '../../../types';
+import { IListing, IListingOwner } from '../../../types';
 
 interface AdminListingDetailsModalProps {
   listing: IListing | null;
   isOpen: boolean;
   onClose: () => void;
-  onModerate: (listingId: string, status: 'active' | 'rejected' | 'archived') => Promise<void>;
+  onModerate: (listingId: string, status: 'published' | 'rejected' | 'archived') => Promise<void>;
 }
 
 export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> = ({
@@ -31,7 +31,7 @@ export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> =
 
   if (!isOpen || !listing) return null;
 
-  const handleAction = async (status: 'active' | 'rejected' | 'archived') => {
+  const handleAction = async (status: 'published' | 'rejected' | 'archived') => {
     setIsSubmitting(true);
     try {
       await onModerate(listing._id, status);
@@ -41,7 +41,10 @@ export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> =
     }
   };
 
-  const owner = typeof listing.ownerId === 'object' && listing.ownerId !== null ? listing.ownerId : null;
+  const owner =
+    typeof listing.ownerId === 'object' && listing.ownerId !== null
+      ? (listing.ownerId as IListingOwner)
+      : null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
@@ -68,9 +71,9 @@ export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> =
         {/* Corps défilable */}
         <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
           {/* Galerie Photos */}
-          {listing.photos && listing.photos.length > 0 && (
+          {listing.images && listing.images.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {listing.photos.map((photo, idx) => (
+              {listing.images.map((photo: string, idx: number) => (
                 <img
                   key={idx}
                   src={photo}
@@ -98,7 +101,7 @@ export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> =
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
               <span>
-                Titre : <strong className="text-slate-900 dark:text-white uppercase">{listing.legalStatus || 'ACD'}</strong>
+                Titre : <strong className="text-slate-900 dark:text-white uppercase">{listing.titleType || 'ACD'}</strong>
               </span>
             </div>
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
@@ -152,7 +155,7 @@ export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> =
           </button>
           <button
             type="button"
-            onClick={() => handleAction('active')}
+            onClick={() => handleAction('published')}
             disabled={isSubmitting}
             className="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
           >
@@ -161,10 +164,11 @@ export const AdminListingDetailsModal: React.FC<AdminListingDetailsModalProps> =
             ) : (
               <CheckCircle className="w-4 h-4" />
             )}
-            <span>Approuver & Mettre en ligne</span>
+            <span>Approuver &amp; Mettre en ligne</span>
           </button>
         </div>
       </div>
     </div>
   );
 };
+

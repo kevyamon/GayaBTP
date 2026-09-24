@@ -63,7 +63,8 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (data.user.role !== 'admin') {
         throw new Error('Accès réservé exclusivement aux administrateurs.');
       }
-      setAdminSession(data.user, data.accessToken);
+      const token = data.accessToken || (data as unknown as { tokens?: { accessToken: string } }).tokens?.accessToken || '';
+      setAdminSession(data.user, token);
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +74,8 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     setIsLoading(true);
     try {
       const data = await adminService.register(payload);
-      setAdminSession(data.user, data.accessToken);
+      const token = data.accessToken || (data as unknown as { tokens?: { accessToken: string } }).tokens?.accessToken || '';
+      setAdminSession(data.user, token);
     } finally {
       setIsLoading(false);
     }
