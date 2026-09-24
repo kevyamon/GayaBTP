@@ -202,4 +202,16 @@ export const authService = {
       );
     }
   },
+
+  async changePassword(payload: { currentPassword: string; newPassword: string }): Promise<string> {
+    try {
+      const response = await api.post<ApiResponse<{ message?: string }>>('/auth/change-password', payload);
+      return response.data.message || response.data.data?.message || 'Mot de passe modifié avec succès.';
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } }; message?: string };
+      throw new Error(
+        error.response?.data?.message || error.message || 'Impossible de modifier le mot de passe.'
+      );
+    }
+  },
 };

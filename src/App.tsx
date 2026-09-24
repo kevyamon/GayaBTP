@@ -32,6 +32,7 @@ import { JobsPage } from './pages/JobsPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { UserDashboardPage } from './pages/UserDashboardPage';
+import { PublicProfilePage } from './pages/PublicProfilePage';
 import { AuthGuard } from './components/auth/AuthGuard';
 
 const AppContent: React.FC = () => {
@@ -83,6 +84,8 @@ const AppContent: React.FC = () => {
           {/* SPRINT 4 (Authentification & Espace Personnel) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profil/:id" element={<PublicProfilePage />} />
+          <Route path="/utilisateurs/:id" element={<PublicProfilePage />} />
           <Route
             path="/dashboard"
             element={

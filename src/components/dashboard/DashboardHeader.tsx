@@ -11,11 +11,13 @@ import {
   Edit3,
   Mail,
   Phone,
+  KeyRound,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { EditProfileModal } from './EditProfileModal';
+import { ChangePasswordModal } from './ChangePasswordModal';
 
 const DEFAULT_COVER = 'https://images.unsplash.com/photo-1541888946425-d0fbb186156a?auto=format&fit=crop&w=1200&q=80';
 
@@ -24,6 +26,7 @@ export const DashboardHeader: React.FC = () => {
   const { success } = useToast();
   const navigate = useNavigate();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -84,12 +87,12 @@ export const DashboardHeader: React.FC = () => {
               </div>
             </div>
 
-            {/* Actions Droite (Modifier profil & Déconnexion) */}
-            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+            {/* Actions Droite (Modifier profil, Mot de passe & Déconnexion) */}
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-sm"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-sm"
               >
                 <Edit3 className="w-4 h-4 text-brand-primary" />
                 <span>Modifier mon profil</span>
@@ -97,8 +100,17 @@ export const DashboardHeader: React.FC = () => {
 
               <button
                 type="button"
+                onClick={() => setIsPasswordModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shadow-sm"
+              >
+                <KeyRound className="w-4 h-4 text-brand-primary" />
+                <span>Sécurité & Mot de passe</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleLogout}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shrink-0"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-900/40 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-xs sm:text-sm font-semibold transition-colors cursor-pointer shrink-0"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Se déconnecter</span>
@@ -204,6 +216,12 @@ export const DashboardHeader: React.FC = () => {
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
+      />
+
+      {/* Modale de Modification du Mot de Passe */}
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
       />
     </>
   );
